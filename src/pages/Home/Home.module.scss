@@ -1,0 +1,51 @@
+.hero-banner {
+    max-height: 540px;
+    // height: 375px;
+    width: 100%;
+    padding-top: 0.8rem;
+}
+
+.home-category {
+    margin-top: 48px;
+    padding-bottom: 70px;
+}
+
+.category-container {
+    // width: 1440px;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.category-list {
+    display: flex;
+    justify-content: center;
+}
+
+.category-item {
+    padding: 0 15px;
+}
+
+.category-block {
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.category-block--content {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px 20px;
+}
+
+
+
+@media (min-width: 1200px) {
+    .category-container {
+        max-width: 1400px;
+    }
+}

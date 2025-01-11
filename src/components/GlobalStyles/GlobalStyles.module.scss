@@ -1,0 +1,57 @@
+@import 'normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #003b95;
+    --white: #fff;
+    --shop-color-text: #252a2b;
+    --font-family: BlinkMacSystemFont, -apple-system, 'Quicksand', Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: 1.6rem;
+    line-height: 1.5;
+    text-rendering: optimizeSpeed;
+    overflow-y: overlay;
+    background-color: #f7f7f7;
+}
+
+button,
+input,
+[tabindex] {
+    border: none;
+    outline: none;
+    font-family: var(--font-family);
+}
+
+input::placeholder {
+    font-family: var(--font-family);
+}
+
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+    display: none;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+}
+
+table {
+    border-spacing: 0;
+    width: 100%;
+    border-collapse: collapse;
+}

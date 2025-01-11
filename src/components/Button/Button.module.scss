@@ -1,0 +1,132 @@
+.wrapper {
+    font-family: var(--font-family);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    min-height: 38px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    background-color: transparent;
+    color: rgb(22, 24, 35);
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    & .disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
+
+.icon + .title,
+.title + .icon {
+    margin-left: 8px;
+}
+
+.icon {
+    display: flex;
+}
+
+.rounded {
+    // font-size: 14px;
+    color: rgba(22, 24, 35, 0.75);
+    border-color: rgba(22, 24, 35, 0.12);
+    border-radius: 999px;
+    box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 8px;
+    // padding: 7px 8px;
+
+    &:hover {
+        border-color: rgba(22, 24, 35, 0.2);
+    }
+}
+
+.outline {
+    color: #006ce4;
+    background-color: #fff;
+    border-color: currentColor;
+
+    // &:hover {
+    //     border-color: currentColor;
+    //     background-color: rgba(254, 44, 85, 0.06);
+    // }
+}
+
+.outlineDarkColor {
+    border-color: rgba(22, 24, 35, 0.12);
+    background: var(--white);
+    font-weight: 600;
+
+    &:hover {
+        background-color: rgba(22, 24, 35, 0.03);
+    }
+}
+
+.wrapper.onlyIcon {
+    height: 4rem;
+    min-width: 4rem;
+
+    .icon + .title,
+    .title + .icon {
+        margin-left: 0px;
+    }
+}
+
+.text {
+    color: #fff;
+}
+
+.secondary {
+    color: #006ce4;
+    border-color: currentColor;
+    background-color: #fff;
+    position: relative;
+
+    &::before {
+        background-color: transparent;
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    &:hover:before {
+        background-color: rgba(0, 108, 228, 0.06);
+    }
+}
+
+.primary {
+    color: var(--white);
+    background-color: var(--primary);
+    border-radius: 20px;
+    border-color: var(--primary);
+    position: relative;
+
+    &:hover {
+        background-color: #0057b8;
+        border-color: #0057b8;
+    }
+}
+
+.small {
+    min-width: 88px;
+    min-height: 35px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 2rem;
+    padding: 4px 16px;
+}
+
+.large {
+    min-width: 88px;
+    padding: 10px 16px;
+}
+
+.xLarge {
+    min-width: 148px;
+    padding: 14px 16px;
+}
