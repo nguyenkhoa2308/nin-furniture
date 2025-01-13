@@ -25,7 +25,11 @@ function Home() {
                                     </Link>
                                 </div>
                                 <div className={cx('category-block--content')}>
-                                    <h3 className={cx('category-block--title')}>Phòng khách</h3>
+                                    <h3 className={cx('block-title')}>
+                                        <Link to="/" className={cx('title-link')}>
+                                            Phòng khách
+                                        </Link>
+                                    </h3>
                                     <Link to="/" className={cx('view-btn')}>
                                         Xem ngay
                                     </Link>
@@ -40,7 +44,11 @@ function Home() {
                                     </Link>
                                 </div>
                                 <div className={cx('category-block--content')}>
-                                    <h3 className={cx('category-block--title')}>Phòng ngủ</h3>
+                                    <h3 className={cx('block-title')}>
+                                        <Link to="/" className={cx('title-link')}>
+                                            Phòng ngủ
+                                        </Link>
+                                    </h3>
                                     <Link to="/" className={cx('view-btn')}>
                                         Xem ngay
                                     </Link>
@@ -55,7 +63,11 @@ function Home() {
                                     </Link>
                                 </div>
                                 <div className={cx('category-block--content')}>
-                                    <h3 className={cx('category-block--title')}>Phòng ăn và bếp</h3>
+                                    <h3 className={cx('block-title')}>
+                                        <Link to="/" className={cx('title-link')}>
+                                            Phòng ăn và bếp
+                                        </Link>
+                                    </h3>
                                     <Link to="/" className={cx('view-btn')}>
                                         Xem ngay
                                     </Link>
@@ -70,7 +82,11 @@ function Home() {
                                     </Link>
                                 </div>
                                 <div className={cx('category-block--content')}>
-                                    <h3 className={cx('category-block--title')}>Phòng làm việc</h3>
+                                    <h3 className={cx('block-title')}>
+                                        <Link to="/" className={cx('title-link')}>
+                                            Phòng làm việc
+                                        </Link>
+                                    </h3>
                                     <Link to="/" className={cx('view-btn')}>
                                         Xem ngay
                                     </Link>
@@ -80,8 +96,9 @@ function Home() {
                     </div>
                 </div>
             </div>
-            <div className={cx('search-box')}></div>
-            <div className={cx('container')}></div>
+            <div className={cx('container')}>
+                
+            </div>
         </div>
     );
 }

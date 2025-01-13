@@ -32,6 +32,14 @@
     position: relative;
     overflow: hidden;
     border-radius: 5px;
+
+    &:hover .category-block--image {
+        transform: scale(1.1);
+    }
+}
+
+.category-block--image {
+    transition: all 400ms ease;
 }
 
 .category-block--content {
@@ -42,7 +50,19 @@
     padding: 10px 20px;
 }
 
+.block-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 10px 0 5px;
 
+    & .title-link {
+        color: var(--primary);
+    }
+}
+
+.view-btn {
+    font-size: 1.4rem;
+}
 
 @media (min-width: 1200px) {
     .category-container {

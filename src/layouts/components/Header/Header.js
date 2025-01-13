@@ -86,7 +86,7 @@ function Header() {
                                                             icon={faEnvelope}
                                                             className={cx('input-icon')}
                                                         />
-                                                    </div>{' '}
+                                                    </div>
                                                     <div className={cx('input-group')}>
                                                         <input
                                                             type="password"
