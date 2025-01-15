@@ -4,7 +4,9 @@ import { faFilter, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './CategoryPage.module.scss';
 import Button from '~/components/Button';
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import ProductList from '~/components/ProductList';
+import { useParams } from 'react-router-dom';
 
 const cx = classnames.bind(styles);
 
@@ -41,6 +43,36 @@ const SORT_MENU = [
 
 function CategoryPage() {
     const [selectedValue, setSelectedValue] = useState('price-asc');
+    const [productCount, setProductCount] = useState(0); // Để lưu số lượng sản phẩm
+    const [brands, setBrands] = useState([]);
+    const [category, setCategory] = useState('');
+    const slug = useParams();
+
+    // Callback function để nhận số lượng sản phẩm từ ProductList
+    const handleProductCount = useCallback((count) => {
+        setProductCount(count);
+    }, []);
+
+    const handleBrandChange = useCallback((brands) => {
+        setBrands(brands);
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:410/api/categories/${slug.slug}`); // Gọi API danh mục
+                const data = await response.json(); // Chuyển đổi response thành JSON
+                setCategory(data);
+            } catch (err) {
+                console.log(err);
+            } finally {
+                // setLoading(false);
+            }
+        };
+
+        fetchData();
+        // eslint-disable-next-line
+    }, [slug]);
 
     const renderMenu = () => {
         return SORT_MENU.map((item, index) => {
@@ -73,28 +105,21 @@ function CategoryPage() {
                             </div>
                             <div className={cx('filter-group-content')}>
                                 <ul className={cx('checkbox-list')}>
-                                    <li className={cx('checkbox-item')}>
-                                        <input
-                                            type="checkbox"
-                                            id="data-brand-1"
-                                            value="TAMPA"
-                                            className={cx('input-field')}
-                                        />
-                                        <label className={cx('checkbox-label')} htmlFor="data-brand-1">
-                                            TAMPA
-                                        </label>
-                                    </li>
-                                    <li className={cx('checkbox-item')}>
-                                        <input
-                                            type="checkbox"
-                                            id="data-brand-2"
-                                            value="NELLY"
-                                            className={cx('input-field')}
-                                        />
-                                        <label className={cx('checkbox-label')} htmlFor="data-brand-2">
-                                            NELLY
-                                        </label>
-                                    </li>
+                                    {brands.map((item, index) => {
+                                        return (
+                                            <li className={cx('checkbox-item')} key={index}>
+                                                <input
+                                                    type="checkbox"
+                                                    id={`data-brand-${index}`}
+                                                    value={item}
+                                                    className={cx('input-field')}
+                                                />
+                                                <label className={cx('checkbox-label')} htmlFor={`data-brand-${index}`}>
+                                                    {item}
+                                                </label>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
                             </div>
                         </div>
@@ -144,10 +169,10 @@ function CategoryPage() {
                     <div className={cx('heading')}>
                         <div className={cx('heading-content')}>
                             <div className={cx('heading-box')}>
-                                <h1 className={cx('heading-title')}>Sofa</h1>
+                                <h1 className={cx('heading-title')}>{category.displayName}</h1>
                                 <div className={cx('filter-box')}>
                                     <span className={cx('title-count')}>
-                                        <b>6</b> sản phẩm
+                                        <b>{productCount}</b> sản phẩm
                                     </span>
                                 </div>
                             </div>
@@ -170,7 +195,9 @@ function CategoryPage() {
                         </div>
                         <div className={cx('filter-tags')}></div>
                     </div>
-                    <div className={cx('list-product')}></div>
+                    <div className={cx('list-product')}>
+                        <ProductList onProductCountChange={handleProductCount} onBrandChange={handleBrandChange} />
+                    </div>
                 </div>
             </div>
         </div>

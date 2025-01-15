@@ -5,7 +5,6 @@ import styles from './Home.module.scss';
 import images from '~/assets/images';
 // import Button from '~/components/Button';
 import HeroBanner from '~/components/HeroBanner/HeroBanner';
-import ProductItem from '~/components/ProductItem';
 
 const cx = classnames.bind(styles);
 
@@ -97,9 +96,7 @@ function Home() {
                     </div>
                 </div>
             </div>
-            <div className={cx('container')}>
-                <ProductItem />
-            </div>
+            <div className={cx('container')}>{/* <ProductItem /> */}</div>
         </div>
     );
 }

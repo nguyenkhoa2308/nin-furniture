@@ -18,7 +18,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/category"
+                    path="/category/:slug"
                     element={
                         <DefaultLayout>
                             <CategoryPage />

@@ -1,6 +1,6 @@
 import classnames from 'classnames/bind';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
@@ -14,22 +14,25 @@ import DropDownMenu from '~/components/DropDownMenu';
 const cx = classnames.bind(styles);
 
 const HEADER_TAB = [
-    { title: 'Sofa', link: '/sofa' },
-    { title: 'Bàn', link: '/desk' },
-    { title: 'Ghế', link: '/chair' },
-    { title: 'Giường nệm', link: '/beds-mattresses' },
-    { title: 'Chăn ga gối', link: '/bedding' },
-    { title: 'Tủ kệ', link: '/store-organization' },
-    { title: 'Nội thất văn phòng', link: '/office' },
-    { title: 'Trang trí', link: '/decor' },
-    { title: 'Nhà bếp', link: '/kitchen' },
-    { title: 'Phòng tắm', link: '/bathroom' },
+    { title: 'Sofa', slug: 'sofa' },
+    { title: 'Bàn', slug: 'desk' },
+    { title: 'Ghế', slug: 'chair' },
+    { title: 'Giường nệm', slug: 'beds-mattresses' },
+    { title: 'Chăn ga gối', slug: 'bedding' },
+    { title: 'Tủ kệ', slug: 'store-organization' },
+    { title: 'Nội thất văn phòng', slug: 'office' },
+    { title: 'Trang trí', slug: 'decor' },
+    { title: 'Nhà bếp', slug: 'kitchen' },
+    { title: 'Phòng tắm', slug: 'bathroom' },
 ];
 
 function Header() {
-    const [activeTab, setActiveTab] = useState(0);
+    // eslint-disable-next-line
+    const [activeTab, setActiveTab] = useState(-1);
     const [openDropDownAccount, setOpenDropDownAccount] = useState(false);
     const [openDropDownCart, setOpenDropDownCart] = useState(false);
+    const location = useLocation();
+    const slug = useParams();
 
     const toggleCartDropdown = () => {
         setOpenDropDownCart(!openDropDownCart);
@@ -40,6 +43,13 @@ function Header() {
         setOpenDropDownAccount(!openDropDownAccount);
         setOpenDropDownCart(false); // Ẩn cart dropdown nếu đang mở
     };
+
+    useEffect(() => {
+        if (location.pathname === '/') {
+            // Kiểm tra nếu trang hiện tại là trang chủ
+            setActiveTab(-1); // Đặt lại activeTab thành -1 khi về trang chủ
+        }
+    }, [location.pathname]);
 
     return (
         <div className={cx('wrapper')}>
@@ -196,10 +206,10 @@ function Header() {
                             return (
                                 <Button
                                     key={index}
-                                    className={cx('header-item', { active: index === activeTab })}
+                                    className={cx('header-item', { active: slug.slug === item.slug })}
                                     leftIcon={item.icon}
                                     outline
-                                    // to={item.link}
+                                    to={`/category/${item.slug}`}
                                     onClick={() => setActiveTab(index)}
                                 >
                                     {item.title}
