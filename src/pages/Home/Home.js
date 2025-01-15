@@ -1,10 +1,11 @@
 import classnames from 'classnames/bind';
+import { Link } from 'react-router-dom';
 
 import styles from './Home.module.scss';
 import images from '~/assets/images';
 // import Button from '~/components/Button';
 import HeroBanner from '~/components/HeroBanner/HeroBanner';
-import { Link } from 'react-router-dom';
+import ProductItem from '~/components/ProductItem';
 
 const cx = classnames.bind(styles);
 
@@ -97,7 +98,7 @@ function Home() {
                 </div>
             </div>
             <div className={cx('container')}>
-                
+                <ProductItem />
             </div>
         </div>
     );

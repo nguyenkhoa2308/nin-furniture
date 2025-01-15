@@ -1,7 +1,7 @@
 .wrapper {
     color: var(--white);
     padding: 8px 0 0;
-    background-color: #003b95;
+    background-color: var(--primary);
 }
 
 .container {
@@ -27,6 +27,7 @@
     font-family: 'Fredoka', serif;
     min-width: 150px;
     padding: 0 15px;
+    color: var(--white);
     cursor: pointer;
 }
 
@@ -240,7 +241,9 @@
 
     & ~ .input-icon {
         position: absolute;
-        color: #84abe7;
+        // color: #84abe7;
+        color: var(--primary);
+        opacity: 0.5;
         font-size: 1.6rem;
         top: 50%;
         left: 0.9rem;
@@ -248,8 +251,18 @@
     }
 
     &::placeholder {
-        color: #84abe7;
+        color: var(--primary);
+        opacity: 0.5;
         font-size: 1.4rem;
+    }
+
+    &:not(:placeholder-shown) {
+        color: #000;
+
+        & ~ .input-icon {
+            color: var(--primary);
+            opacity: 1;
+        }
     }
 
     &:focus {
@@ -257,10 +270,12 @@
 
         & ~ .input-icon {
             color: var(--primary);
+            opacity: 1;
         }
 
         &::placeholder {
             color: var(--primary);
+            // opacity: 1;
         }
     }
 }

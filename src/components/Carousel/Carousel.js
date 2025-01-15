@@ -33,7 +33,7 @@ function Carousel({ slides }) {
     useEffect(() => {
         resetAutoplay();
         return () => clearTimeout(autoplayRef.current); // Cleanup timeout khi unmount
-    }, [slide]); // Mỗi lần slide thay đổi, khởi động lại autoplay
+    }); // Mỗi lần slide thay đổi, khởi động lại autoplay
 
     return (
         <div className={cx('carousel')}>

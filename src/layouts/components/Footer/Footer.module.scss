@@ -1,7 +1,7 @@
 .wrapper {
     background-color: var(--white);
     padding-top: 20px;
-    color: #333;
+    color: var(--dark-charcoal);
 }
 
 .wrapbox-newsletter {
@@ -79,13 +79,13 @@
 }
 
 .footer-copyright {
-    color: #333;
+    color: var(--dark-charcoal);
     font-size: 1.3rem;
     padding: 16px;
     text-align: center;
 
     & a {
-        color: #333;
+        color: var(--dark-charcoal);
     }
 }
 
@@ -101,8 +101,8 @@
     line-height: 30px;
     font-size: 14px;
     background-color: transparent;
-    border: 1px solid #333;
-    color: #333;
+    border: 1px solid var(--dark-charcoal);
+    color: var(--dark-charcoal);
     display: block;
     text-align: center;
     border-radius: 50%;

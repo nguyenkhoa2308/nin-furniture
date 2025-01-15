@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Home from '~/pages/Home';
 import DefaultLayout from '~/layouts/DefaultLayout';
+import CategoryPage from './pages/CategoryPage';
 
 function App() {
     return (
@@ -13,6 +14,14 @@ function App() {
                     element={
                         <DefaultLayout>
                             <Home />
+                        </DefaultLayout>
+                    }
+                />
+                <Route
+                    path="/category"
+                    element={
+                        <DefaultLayout>
+                            <CategoryPage />
                         </DefaultLayout>
                     }
                 />

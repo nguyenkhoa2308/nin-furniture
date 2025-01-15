@@ -1,15 +1,15 @@
-import { useState } from 'react';
 import classnames from 'classnames/bind';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDown, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './Header.module.scss';
 import { AccountIcon, CartIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
 import Button from '~/components/Button';
 import Search from '../Search';
 import DropDownMenu from '~/components/DropDownMenu';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faLock } from '@fortawesome/free-solid-svg-icons';
-import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 
 const cx = classnames.bind(styles);
 
@@ -45,7 +45,10 @@ function Header() {
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
                 <div className={cx('header-bar')}>
-                    <span className={cx('header-logo')}>NinFurniture</span>
+                    <Link to="/">
+                        <span className={cx('header-logo')}>NinFurniture</span>
+                    </Link>
+
                     <div className={cx('header-action')}>
                         <Search />
                         <div className={cx('header-action_account', 'header-action_item')}>
@@ -195,7 +198,7 @@ function Header() {
                                     key={index}
                                     className={cx('header-item', { active: index === activeTab })}
                                     leftIcon={item.icon}
-                                    text
+                                    outline
                                     // to={item.link}
                                     onClick={() => setActiveTab(index)}
                                 >
