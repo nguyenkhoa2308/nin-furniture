@@ -62,16 +62,19 @@
     height: 100%;
     display: flex;
     align-items: center;
-}
-
-.header-action__link {
-    display: flex;
-    position: relative;
     white-space: nowrap;
     font-size: 1.3rem;
     font-weight: 500;
     color: var(--white);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
 }
+
+// .header-action__link {
+//     display: flex;
+//     position: relative;
+// }
 
 .box-icon {
     position: relative;
@@ -121,6 +124,25 @@
 
 .dropdown-account {
     width: 340px;
+}
+
+.account-header {
+    margin: 0 0 20px;
+    padding-bottom: 8px;
+    text-align: center;
+    border-bottom: 1px solid #eae4e8;
+}
+
+.account-title {
+    color: var(--primary);
+    text-transform: uppercase;
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.account-subtitle {
+    font-size: 1.4rem;
+    margin: 5px 0 0;
 }
 
 .dropdown-cart {
@@ -197,105 +219,6 @@
 .view-cart-btn {
     text-transform: uppercase;
     width: 100%;
-}
-
-.account-header {
-    margin: 0 0 20px;
-    padding-bottom: 8px;
-    text-align: center;
-    border-bottom: 1px solid #eae4e8;
-}
-
-.account-title {
-    color: var(--primary);
-    text-transform: uppercase;
-    font-size: 1.8rem;
-    font-weight: 500;
-}
-
-.account-subtitle {
-    font-size: 1.4rem;
-    margin: 5px 0 0;
-}
-
-.account-inner {
-    font-size: 1.3rem;
-}
-
-.input-group {
-    height: 54px;
-    width: 100%;
-    margin-bottom: 1.5rem;
-    position: relative;
-}
-
-.input-field {
-    height: 100%;
-    width: 100%;
-    outline: none;
-    font-size: 1.4rem;
-    color: #677279;
-    border-radius: 0.31rem;
-    border: 1px solid var(--primary);
-    padding: 0 1.25rem 0 3.12rem;
-
-    & ~ .input-icon {
-        position: absolute;
-        // color: #84abe7;
-        color: var(--primary);
-        opacity: 0.5;
-        font-size: 1.6rem;
-        top: 50%;
-        left: 0.9rem;
-        transform: translateY(-50%);
-    }
-
-    &::placeholder {
-        color: var(--primary);
-        opacity: 0.5;
-        font-size: 1.4rem;
-    }
-
-    &:not(:placeholder-shown) {
-        color: #000;
-
-        & ~ .input-icon {
-            color: var(--primary);
-            opacity: 1;
-        }
-    }
-
-    &:focus {
-        color: #000;
-
-        & ~ .input-icon {
-            color: var(--primary);
-            opacity: 1;
-        }
-
-        &::placeholder {
-            color: var(--primary);
-            // opacity: 1;
-        }
-    }
-}
-
-.login-btn {
-    width: 100%;
-    margin-top: 8px;
-}
-
-.forgot-password-link,
-.signup-link {
-    color: var(--primary);
-
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
-.signup-text {
-    margin-top: 8px;
 }
 
 .header-menu {

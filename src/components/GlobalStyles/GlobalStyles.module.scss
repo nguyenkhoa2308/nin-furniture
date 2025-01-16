@@ -23,7 +23,6 @@ html {
 }
 
 body {
-    height: 100%;
     font-family: var(--font-family);
     font-size: 1.4rem;
     line-height: 1.5;
@@ -65,4 +64,20 @@ ol {
     padding: 0;
     margin: 0;
     list-style-type: none;
+}
+
+// Scroll bar css
+html ::-webkit-scrollbar {
+    border-radius: 0px;
+    width: 8px;
+}
+
+html *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22, 24, 35, 0.06);
+}
+
+html *::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
 }

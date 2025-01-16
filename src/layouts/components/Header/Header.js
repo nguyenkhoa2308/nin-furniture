@@ -1,15 +1,15 @@
 import classnames from 'classnames/bind';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faLock } from '@fortawesome/free-solid-svg-icons';
-import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Header.module.scss';
 import { AccountIcon, CartIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
 import Button from '~/components/Button';
 import Search from '../Search';
 import DropDownMenu from '~/components/DropDownMenu';
+import LoginForm from '~/components/LoginForm';
 
 const cx = classnames.bind(styles);
 
@@ -29,22 +29,42 @@ const HEADER_TAB = [
 function Header() {
     // eslint-disable-next-line
     const [activeTab, setActiveTab] = useState(-1);
-    const [openDropDownAccount, setOpenDropDownAccount] = useState(false);
-    const [openDropDownCart, setOpenDropDownCart] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState('');
     const location = useLocation();
     const slug = useParams();
+    const accountRef = useRef();
+    const cartRef = useRef();
+    const dropdownAccountRef = useRef();
+    const dropdownCartRef = useRef();
 
-    const toggleCartDropdown = () => {
-        setOpenDropDownCart(!openDropDownCart);
-        setOpenDropDownAccount(false); // Ẩn account dropdown nếu đang mở
+    const toggleDropdown = (dropdown) => {
+        setActiveDropdown((prev) => (prev === dropdown ? '' : dropdown));
     };
 
-    const toggleAccountDropdown = () => {
-        setOpenDropDownAccount(!openDropDownAccount);
-        setOpenDropDownCart(false); // Ẩn cart dropdown nếu đang mở
-    };
+    // Đóng dropdown khi click bên ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (activeDropdown) {
+                const isInsideAccount =
+                    accountRef.current?.contains(event.target) || dropdownAccountRef.current?.contains(event.target);
+                const isInsideCart =
+                    cartRef.current?.contains(event.target) || dropdownCartRef.current?.contains(event.target);
+
+                if (!isInsideAccount && !isInsideCart) {
+                    setActiveDropdown('');
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [activeDropdown]);
 
     useEffect(() => {
+        setActiveDropdown('');
+
         if (location.pathname === '/') {
             // Kiểm tra nếu trang hiện tại là trang chủ
             setActiveTab(-1); // Đặt lại activeTab thành -1 khi về trang chủ
@@ -62,22 +82,24 @@ function Header() {
                     <div className={cx('header-action')}>
                         <Search />
                         <div className={cx('header-action_account', 'header-action_item')}>
-                            <div className={cx('header-action_text')}>
-                                <Link to="/" className={cx('header-action__link')} onClick={toggleAccountDropdown}>
-                                    <span className={cx('box-icon')}>
-                                        <AccountIcon />
+                            <div
+                                className={cx('header-action_text')}
+                                ref={accountRef}
+                                onClick={() => toggleDropdown('account')}
+                            >
+                                <span className={cx('box-icon')}>
+                                    <AccountIcon />
+                                </span>
+                                <span className={cx('box-text')}>
+                                    Đăng nhập / Đăng ký
+                                    <span className={cx('text-blow')}>
+                                        Tài khoản của tôi
+                                        <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} />
                                     </span>
-                                    <span className={cx('box-text')}>
-                                        Đăng nhập / Đăng ký
-                                        <span className={cx('text-blow')}>
-                                            Tài khoản của tôi
-                                            <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} />
-                                        </span>
-                                    </span>
-                                </Link>
+                                </span>
                             </div>
-                            <div className={cx('header-action_dropdown')}>
-                                {openDropDownAccount && (
+                            <div className={cx('header-action_dropdown')} ref={dropdownAccountRef}>
+                                {activeDropdown === 'account' && (
                                     <DropDownMenu className={cx('dropdown-account')}>
                                         <div className={cx('header-dropdown_content')}>
                                             <div className={cx('account-header')}>
@@ -86,69 +108,30 @@ function Header() {
                                                     Nhập email và mật khẩu của bạn:
                                                 </p>
                                             </div>
-                                            <div className={cx('account-inner')}>
-                                                <form className={cx('login-form')}>
-                                                    <div className={cx('input-group')}>
-                                                        <input
-                                                            type="email"
-                                                            placeholder="Email address"
-                                                            className={cx('input-field')}
-                                                            required
-                                                        />
-                                                        <FontAwesomeIcon
-                                                            icon={faEnvelope}
-                                                            className={cx('input-icon')}
-                                                        />
-                                                    </div>
-                                                    <div className={cx('input-group')}>
-                                                        <input
-                                                            type="password"
-                                                            placeholder="Password"
-                                                            className={cx('input-field')}
-                                                            required
-                                                        />
-                                                        <FontAwesomeIcon icon={faLock} className={cx('input-icon')} />
-                                                    </div>
-                                                    <Link to="/" className={cx('forgot-password-link')}>
-                                                        Quên mật khẩu?
-                                                    </Link>
-                                                    <Button
-                                                        primary
-                                                        className={cx('login-btn', {
-                                                            // disabled: !email || !password,
-                                                        })}
-                                                    >
-                                                        Đăng nhập
-                                                    </Button>
-                                                </form>
-                                                <p className={cx('signup-text')}>
-                                                    Khách hàng mới?{' '}
-                                                    <Link to="/" className={cx('signup-link')}>
-                                                        Tạo tài khoản
-                                                    </Link>
-                                                </p>
-                                            </div>
+                                            <LoginForm />
                                         </div>
                                     </DropDownMenu>
                                 )}
                             </div>
                         </div>
                         <div className={cx('header-action_cart', 'header-action_item')}>
-                            <div className={cx('header-action_text')}>
-                                <Link to="/" className={cx('header-action__link')} onClick={toggleCartDropdown}>
-                                    <span className={cx('box-icon')}>
-                                        <CartIcon />
-                                        <span className={cx('count-holder')}>
-                                            <span className={cx('count')}>0</span>
-                                        </span>
+                            <div
+                                className={cx('header-action_text')}
+                                ref={cartRef}
+                                onClick={() => toggleDropdown('cart')}
+                            >
+                                <span className={cx('box-icon')}>
+                                    <CartIcon />
+                                    <span className={cx('count-holder')}>
+                                        <span className={cx('count')}>0</span>
                                     </span>
-                                    <span className={cx('box-text', 'text-center')}>
-                                        <span className={cx('text-blow')}>Giỏ hàng</span>
-                                    </span>
-                                </Link>
+                                </span>
+                                <span className={cx('box-text', 'text-center')}>
+                                    <span className={cx('text-blow')}>Giỏ hàng</span>
+                                </span>
                             </div>
-                            <div className={cx('header-action_dropdown')}>
-                                {openDropDownCart && (
+                            <div className={cx('header-action_dropdown')} ref={dropdownCartRef}>
+                                {activeDropdown === 'cart' && (
                                     <DropDownMenu className={cx('dropdown-cart')}>
                                         <div className={cx('header-dropdown_content')}>
                                             <p className={cx('box-title')}>Giỏ hàng</p>
@@ -179,7 +162,7 @@ function Header() {
                                                             <td className={cx('total-text')}>0₫</td>
                                                         </tr>
                                                         <tr className={cx('mini-cart__button')}>
-                                                            <td colspan="2">
+                                                            <td colSpan="2">
                                                                 <Button
                                                                     to="/cart"
                                                                     primary

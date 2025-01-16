@@ -1,4 +1,5 @@
 import classNames from 'classnames/bind';
+import { Outlet } from 'react-router-dom';
 
 import styles from './DefaultLayout.module.scss';
 import Header from '~/layouts/components/Header';
@@ -11,7 +12,8 @@ function DefaultLayout({ children }) {
         <div className={cx('wrapper')}>
             <Header />
             <div className={cx('container')}>
-                <div className={cx('content')}>{children}</div>
+                {/* <div className={cx('content')}>{children}</div> */}
+                <Outlet />
             </div>
             <Footer />
         </div>
