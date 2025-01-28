@@ -1,15 +1,12 @@
 import classnames from 'classnames/bind';
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Header.module.scss';
 import { AccountIcon, CartIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
 import Button from '~/components/Button';
 import Search from '../Search';
 import DropDownMenu from '~/components/DropDownMenu';
-import LoginForm from '~/components/LoginForm';
 
 const cx = classnames.bind(styles);
 
@@ -32,9 +29,7 @@ function Header() {
     const [activeDropdown, setActiveDropdown] = useState('');
     const location = useLocation();
     const slug = useParams();
-    const accountRef = useRef();
     const cartRef = useRef();
-    const dropdownAccountRef = useRef();
     const dropdownCartRef = useRef();
 
     const toggleDropdown = (dropdown) => {
@@ -45,12 +40,10 @@ function Header() {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (activeDropdown) {
-                const isInsideAccount =
-                    accountRef.current?.contains(event.target) || dropdownAccountRef.current?.contains(event.target);
                 const isInsideCart =
                     cartRef.current?.contains(event.target) || dropdownCartRef.current?.contains(event.target);
 
-                if (!isInsideAccount && !isInsideCart) {
+                if (!isInsideCart) {
                     setActiveDropdown('');
                 }
             }
@@ -82,11 +75,7 @@ function Header() {
                     <div className={cx('header-action')}>
                         <Search />
                         <div className={cx('header-action_account', 'header-action_item')}>
-                            <div
-                                className={cx('header-action_text')}
-                                ref={accountRef}
-                                onClick={() => toggleDropdown('account')}
-                            >
+                            <Link to={'/login'} className={cx('header-action_text')}>
                                 <span className={cx('box-icon')}>
                                     <AccountIcon />
                                 </span>
@@ -94,25 +83,10 @@ function Header() {
                                     Đăng nhập / Đăng ký
                                     <span className={cx('text-blow')}>
                                         Tài khoản của tôi
-                                        <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} />
+                                        {/* <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} /> */}
                                     </span>
                                 </span>
-                            </div>
-                            <div className={cx('header-action_dropdown')} ref={dropdownAccountRef}>
-                                {activeDropdown === 'account' && (
-                                    <DropDownMenu className={cx('dropdown-account')}>
-                                        <div className={cx('header-dropdown_content')}>
-                                            <div className={cx('account-header')}>
-                                                <h2 className={cx('account-title')}>Đăng nhập tài khoản</h2>
-                                                <p className={cx('account-subtitle')}>
-                                                    Nhập email và mật khẩu của bạn:
-                                                </p>
-                                            </div>
-                                            <LoginForm />
-                                        </div>
-                                    </DropDownMenu>
-                                )}
-                            </div>
+                            </Link>
                         </div>
                         <div className={cx('header-action_cart', 'header-action_item')}>
                             <div
@@ -191,7 +165,7 @@ function Header() {
                                     key={index}
                                     className={cx('header-item', { active: slug.slug === item.slug })}
                                     leftIcon={item.icon}
-                                    outline
+                                    whiteOutline
                                     to={`/category/${item.slug}`}
                                     onClick={() => setActiveTab(index)}
                                 >

@@ -1,6 +1,8 @@
 import classnames from 'classnames/bind';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 // Material UI Imports
 import { TextField, InputAdornment, FormControl, InputLabel, IconButton, OutlinedInput } from '@mui/material';
@@ -11,11 +13,15 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import styles from './LoginForm.module.scss';
 import Button from '~/components/Button';
+import { login } from '~/services/authService';
 
 const cx = classnames.bind(styles);
 
 function LoginForm() {
+    const navigate = useNavigate();
     // const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+
+    const [error, setError] = useState('');
 
     //Inputs
     const [emailInput, setEmailInput] = useState('');
@@ -33,6 +39,17 @@ function LoginForm() {
 
     const handleMouseUpPassword = (event) => {
         event.preventDefault();
+    };
+
+    const handleLogin = async () => {
+        const res = await login(emailInput, passwordInput);
+
+        if (res && res.EC === 0) {
+            localStorage.setItem('token', res.token);
+            navigate('/');
+        } else {
+            setError(res.EM);
+        }
     };
 
     return (
@@ -116,6 +133,12 @@ function LoginForm() {
                                 }}
                             />
                         </FormControl>
+                        {error && (
+                            <div className={cx('error-container')}>
+                                <FontAwesomeIcon icon={faTriangleExclamation} />
+                                <span className={cx('error-message')}>{error}</span>
+                            </div>
+                        )}
                         <div className={cx('forgot-password-link')} onClick={() => setIsForgotPassword(true)}>
                             Quên mật khẩu?
                         </div>
@@ -124,6 +147,7 @@ function LoginForm() {
                             className={cx('login-btn', {
                                 disabled: !emailInput || !passwordInput,
                             })}
+                            onClick={() => handleLogin()}
                         >
                             Đăng nhập
                         </Button>

@@ -50,6 +50,7 @@
 .forgot-password-link,
 .signup-link,
 .login-link {
+    display: inline;
     color: var(--primary);
     cursor: pointer;
 
@@ -69,4 +70,15 @@
 
 .login-link {
     margin-left: 4px;
+}
+
+.error-container {
+    margin-bottom: 8px;
+    font-weight: bold;
+    // font-size: 1.4rem;
+    color: red;
+}
+
+.error-message {
+    margin-left: 8px;
 }

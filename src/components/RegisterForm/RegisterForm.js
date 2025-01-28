@@ -1,5 +1,5 @@
 import classnames from 'classnames/bind';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 
@@ -18,6 +18,8 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 // Material UI Icon Imports
 import Visibility from '@mui/icons-material/Visibility';
@@ -25,23 +27,26 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import styles from './RegisterForm.module.scss';
 import Button from '~/components/Button';
+import * as authService from '~/services/authService';
 
 const cx = classnames.bind(styles);
 
 function RegisterForm() {
     // const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+    const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
 
     //Inputs
     const [lastName, setLastName] = useState('');
     const [firstName, setFirstName] = useState('');
-    const [gender, setGender] = useState();
+    const [gender, setGender] = useState(false);
     const [birthdayInput, setBirthdayInput] = useState(null);
     const [emailInput, setEmailInput] = useState();
     const [passwordInput, setPasswordInput] = useState();
     const [confirmPasswordInput, setConfirmPasswordInput] = useState();
     const [isDefaultSet, setIsDefaultSet] = useState(false); // Cờ để kiểm tra nếu giá trị mặc định đã được gán
+    const [isMatchPassword, setIsMatchPassword] = useState(true); // Cờ để kiểm tra nếu giá trị mặc định đã được gán
 
     const handleOpen = () => {
         if (!isDefaultSet) {
@@ -58,6 +63,31 @@ function RegisterForm() {
 
     const handleMouseUpPassword = (event) => {
         event.preventDefault();
+    };
+
+    const handleRegister = async () => {
+        // Gọi API để đăng ký
+        const formattedDate = dayjs(birthdayInput).format('DD/MM/YYYY');
+
+        if (passwordInput === confirmPasswordInput) {
+            const res = await authService.register(
+                emailInput,
+                passwordInput,
+                firstName,
+                lastName,
+                gender,
+                formattedDate,
+            );
+
+            if (res) {
+                console.log('Success');
+                navigate('/login');
+            }
+
+            console.log(res);
+        } else {
+            setIsMatchPassword(false);
+        }
     };
 
     return (
@@ -124,8 +154,7 @@ function RegisterForm() {
                             aria-labelledby="radio-buttons-group-label"
                             defaultValue="female"
                             name="radio-buttons-group"
-                            value={gender}
-                            onChange={(event) => setGender(event.target.value)}
+                            // value={gender}
                         >
                             <FormControlLabel
                                 value="female"
@@ -151,6 +180,7 @@ function RegisterForm() {
                                         color: 'var(--shop-color-text)',
                                     },
                                 }}
+                                onChange={() => setGender(false)}
                             />
                             <FormControlLabel
                                 value="male"
@@ -176,8 +206,9 @@ function RegisterForm() {
                                         color: 'var(--shop-color-text)',
                                     },
                                 }}
+                                onChange={() => setGender(true)}
                             />
-                            <FormControlLabel
+                            {/* <FormControlLabel
                                 value="other"
                                 control={
                                     <Radio
@@ -201,7 +232,7 @@ function RegisterForm() {
                                         color: 'var(--shop-color-text)',
                                     },
                                 }}
-                            />
+                            /> */}
                         </RadioGroup>
                     </FormControl>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -374,6 +405,12 @@ function RegisterForm() {
                             }}
                         />
                     </FormControl>
+                    {!isMatchPassword && (
+                        <div className={cx('error-container')}>
+                            <FontAwesomeIcon icon={faTriangleExclamation} />
+                            <span className={cx('error-message')}>Mật khẩu không khớp</span>
+                        </div>
+                    )}
                     <div className={cx('action-container')}>
                         <Button
                             primary
@@ -381,6 +418,7 @@ function RegisterForm() {
                             className={cx('register-btn', {
                                 disabled: !emailInput || !passwordInput || !confirmPasswordInput,
                             })}
+                            onClick={() => handleRegister()}
                         >
                             Đăng ký
                         </Button>

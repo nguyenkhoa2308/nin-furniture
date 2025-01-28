@@ -52,12 +52,12 @@ function ProductList({ onProductCountChange, onBrandChange }) {
                     <div className={cx('product-container')} key={index}>
                         <div className={cx('product-card')}>
                             <div className={cx('product-image-container')}>
-                                <Link to="/">
+                                <Link to={`/products/${product.slug}`}>
                                     <img src={product.image} alt={product.name} className={cx('product-image')} />
                                 </Link>
                             </div>
                             <div className={cx('product-detail')}>
-                                <Link to="/">
+                                <Link to={`/products/${product.slug}`}>
                                     <h3 className={cx('product-name')}>{product.name}</h3>
                                 </Link>
                                 <div className={cx('product-price')}>

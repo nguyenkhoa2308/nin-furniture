@@ -29,6 +29,10 @@
     display: flex;
 }
 
+.title {
+    z-index: 2;
+}
+
 .rounded {
     // font-size: 14px;
     color: rgba(22, 24, 35, 0.75);
@@ -42,8 +46,13 @@
     }
 }
 
-.outline {
+.whiteOutline {
     color: var(--white);
+}
+
+.outline {
+    border: 1px solid var(--primary);
+    color: var(--primary);
 }
 
 .outlineDarkColor {
