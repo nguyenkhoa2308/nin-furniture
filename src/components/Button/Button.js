@@ -25,11 +25,13 @@ function Button({
     leftIcon,
     rightIcon,
     onClick,
+    onKeyDown,
     ...passProps
 }) {
     let Comp = 'button';
     const _props = {
         onClick,
+        onKeyDown,
         ...passProps,
     };
 

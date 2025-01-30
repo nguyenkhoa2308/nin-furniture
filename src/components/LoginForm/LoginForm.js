@@ -1,6 +1,6 @@
 import classnames from 'classnames/bind';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,11 +14,13 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import styles from './LoginForm.module.scss';
 import Button from '~/components/Button';
 import { login } from '~/services/authService';
+import { AuthContext } from '~/contexts/AuthContext';
 
 const cx = classnames.bind(styles);
 
 function LoginForm() {
     const navigate = useNavigate();
+    const { setAuth } = useContext(AuthContext);
     // const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
     const [error, setError] = useState('');
@@ -45,10 +47,25 @@ function LoginForm() {
         const res = await login(emailInput, passwordInput);
 
         if (res && res.EC === 0) {
-            localStorage.setItem('token', res.token);
+            localStorage.setItem('access_token', res.access_token);
+            setAuth({
+                isAuthenticated: true,
+                user: {
+                    email: res?.user?.email ?? '',
+                    name: res?.user?.name ?? '',
+                },
+            });
+            // console.log(res);
             navigate('/');
         } else {
             setError(res.EM);
+        }
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter' && emailInput && passwordInput) {
+            event.preventDefault(); // Ngừng hành động mặc định của Enter
+            handleLogin(); // Gọi hàm đăng nhập nếu có đủ thông tin
         }
     };
 
@@ -56,7 +73,7 @@ function LoginForm() {
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
                 {!isForgotPassword && (
-                    <div className={cx('login-inner')}>
+                    <div className={cx('login-inner')} onKeyDown={handleKeyDown}>
                         <TextField
                             label="Email"
                             value={emailInput}

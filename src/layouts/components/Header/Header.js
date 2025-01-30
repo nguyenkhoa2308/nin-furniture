@@ -1,12 +1,17 @@
 import classnames from 'classnames/bind';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import Tippy from '@tippyjs/react/headless';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAddressBook, faUser } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './Header.module.scss';
 import { AccountIcon, CartIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
 import Button from '~/components/Button';
 import Search from '../Search';
 import DropDownMenu from '~/components/DropDownMenu';
+import { AuthContext } from '~/contexts/AuthContext';
+import { faAngleDown, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classnames.bind(styles);
 
@@ -24,6 +29,45 @@ const HEADER_TAB = [
 ];
 
 function Header() {
+    const { auth, setAuth } = useContext(AuthContext);
+
+    const [visible, setVisible] = useState(false);
+    const show = () => setVisible(true);
+    const hide = () => setVisible(false);
+
+    const USER_MENU = [
+        {
+            title: 'Thông tin tài khoản',
+            icon: <FontAwesomeIcon icon={faUser} />,
+            to: '/account',
+            value: 'view-profile',
+        },
+        {
+            title: 'Danh sách địa chỉ',
+            icon: <FontAwesomeIcon icon={faAddressBook} />,
+            value: 'address-list',
+        },
+        {
+            title: 'Đăng xuất',
+            icon: <FontAwesomeIcon icon={faArrowRightFromBracket} />,
+            clickAction: () => {
+                localStorage.removeItem('access_token');
+                setAuth({
+                    isAuthenticated: false,
+                    user: {
+                        email: '',
+                        name: '',
+                    },
+                });
+                hide();
+            },
+            separate: true,
+            value: 'logout',
+        },
+    ];
+
+    // console.log(auth);
+
     // eslint-disable-next-line
     const [activeTab, setActiveTab] = useState(-1);
     const [activeDropdown, setActiveDropdown] = useState('');
@@ -35,6 +79,34 @@ function Header() {
     const toggleDropdown = (dropdown) => {
         setActiveDropdown((prev) => (prev === dropdown ? '' : dropdown));
     };
+
+    const renderMenu = () => {
+        return USER_MENU.map((item, index) => {
+            return (
+                <Button
+                    key={index}
+                    className={cx('menu-option', {
+                        separate: item.separate,
+                    })}
+                    leftIcon={<span className={cx('menu-icon')}>{item.icon}</span>}
+                    // onClick={() => setSelectedValue(item.value)}
+                    to={item.to}
+                    onClick={item.clickAction}
+                >
+                    <span className={cx('menu-item--title')}>{item.title}</span>
+                </Button>
+            );
+        });
+    };
+
+    const renderResult = (attrs) => (
+        <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
+            <div className={cx('menu-popper')}>
+                {/* {history.length > 1 && <Header title={current.title} onBack={handleBack} />} */}
+                <div className={cx('menu-body')}>{renderMenu()}</div>
+            </div>
+        </div>
+    );
 
     // Đóng dropdown khi click bên ngoài
     useEffect(() => {
@@ -75,18 +147,44 @@ function Header() {
                     <div className={cx('header-action')}>
                         <Search />
                         <div className={cx('header-action_account', 'header-action_item')}>
-                            <Link to={'/login'} className={cx('header-action_text')}>
-                                <span className={cx('box-icon')}>
-                                    <AccountIcon />
-                                </span>
-                                <span className={cx('box-text')}>
-                                    Đăng nhập / Đăng ký
-                                    <span className={cx('text-blow')}>
-                                        Tài khoản của tôi
-                                        {/* <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} /> */}
+                            {/* <div className={cx('dropdown')}>
+                                <div className={cx('menu-list')}>
+                                    <div className={cx('menu-body')}>{renderMenu()}</div>
+                                </div>
+                            </div> */}
+
+                            <Tippy
+                                visible={visible}
+                                interactive={true}
+                                onClickOutside={hide}
+                                delay={[0, 500]}
+                                placement="bottom-end"
+                                render={renderResult}
+                            >
+                                <Link
+                                    className={cx('header-action_text')}
+                                    to={auth.isAuthenticated ? null : '/login'}
+                                    onClick={auth.isAuthenticated ? (visible ? hide : show) : null}
+                                >
+                                    <span className={cx('box-icon')}>
+                                        <AccountIcon />
                                     </span>
-                                </span>
-                            </Link>
+                                    {auth.isAuthenticated ? (
+                                        <span className={cx('box-text')}>
+                                            Tài khoản của
+                                            <span className={cx('text-blow')}>
+                                                {auth.user.name}{' '}
+                                                <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} />
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        <span className={cx('box-text')}>
+                                            Đăng nhập / Đăng ký
+                                            <span className={cx('text-blow')}>Tài khoản của tôi</span>
+                                        </span>
+                                    )}
+                                </Link>
+                            </Tippy>
                         </div>
                         <div className={cx('header-action_cart', 'header-action_item')}>
                             <div

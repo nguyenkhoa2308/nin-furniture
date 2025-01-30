@@ -42,9 +42,9 @@ function RegisterForm() {
     const [firstName, setFirstName] = useState('');
     const [gender, setGender] = useState(false);
     const [birthdayInput, setBirthdayInput] = useState(null);
-    const [emailInput, setEmailInput] = useState();
-    const [passwordInput, setPasswordInput] = useState();
-    const [confirmPasswordInput, setConfirmPasswordInput] = useState();
+    const [emailInput, setEmailInput] = useState('');
+    const [passwordInput, setPasswordInput] = useState('');
+    const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
     const [isDefaultSet, setIsDefaultSet] = useState(false); // Cờ để kiểm tra nếu giá trị mặc định đã được gán
     const [isMatchPassword, setIsMatchPassword] = useState(true); // Cờ để kiểm tra nếu giá trị mặc định đã được gán
 
