@@ -21,6 +21,7 @@ function DefaultLayout() {
                     setAuth({
                         isAuthenticated: true,
                         user: {
+                            id: res.id,
                             email: res.email,
                             name: res.name,
                         },

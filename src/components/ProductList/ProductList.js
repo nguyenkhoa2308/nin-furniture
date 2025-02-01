@@ -1,15 +1,19 @@
 import classnames from 'classnames/bind';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import styles from './ProductList.module.scss';
 import { CartIcon } from '../Icons';
 import Button from '~/components/Button';
+// import httpRequest from '~/utils/httpRequest';
+import { CartContext } from '~/contexts/CartContext';
 // import ProductItem from '../ProductItem';
 
 const cx = classnames.bind(styles);
 
 function ProductList({ onProductCountChange, onBrandChange }) {
+    const { addToCart } = useContext(CartContext);
+
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -35,6 +39,10 @@ function ProductList({ onProductCountChange, onBrandChange }) {
         fetchData();
         // eslint-disable-next-line
     }, [category, onProductCountChange, onBrandChange]);
+
+    const handleAddToCart = async (productId, quantity) => {
+        await addToCart(productId, quantity);
+    };
 
     if (loading) {
         return <div>Loading...</div>;
@@ -82,6 +90,7 @@ function ProductList({ onProductCountChange, onBrandChange }) {
                                             text
                                             small
                                             className={cx('add-to-cart-btn')}
+                                            onClick={() => handleAddToCart(product._id, 1)}
                                             // rightIcon={<CartIcon width="1.6rem" height="3.1rem" />}
                                         >
                                             Thêm vào giỏ

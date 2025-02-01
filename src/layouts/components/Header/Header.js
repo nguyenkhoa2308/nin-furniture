@@ -1,9 +1,10 @@
 import classnames from 'classnames/bind';
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import Tippy from '@tippyjs/react/headless';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAddressBook, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faAddressBook, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
+import { MenuItem } from '@mui/material';
+import { faAngleDown, faArrowRightFromBracket, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Header.module.scss';
 import { AccountIcon, CartIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
@@ -11,7 +12,7 @@ import Button from '~/components/Button';
 import Search from '../Search';
 import DropDownMenu from '~/components/DropDownMenu';
 import { AuthContext } from '~/contexts/AuthContext';
-import { faAngleDown, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { CartContext } from '~/contexts/CartContext';
 
 const cx = classnames.bind(styles);
 
@@ -31,9 +32,47 @@ const HEADER_TAB = [
 function Header() {
     const { auth, setAuth } = useContext(AuthContext);
 
-    const [visible, setVisible] = useState(false);
-    const show = () => setVisible(true);
-    const hide = () => setVisible(false);
+    const slug = useParams();
+    const location = useLocation();
+    // eslint-disable-next-line
+    const [activeTab, setActiveTab] = useState(-1);
+    const [accountAnchorEl, setAccountAnchorEl] = useState(null);
+    const [cartAnchorEl, setCartAnchorEl] = useState(null);
+    const [accountOpen, setAccountOpen] = useState(false);
+    const [cartOpen, setCartOpen] = useState(false);
+    const [cartQuantities, setCartQuantities] = useState({});
+
+    // eslint-disable-next-line
+    const { cartItems, countItems } = useContext(CartContext);
+
+    const handleAccountClick = (event) => {
+        setAccountAnchorEl(event.currentTarget);
+        setAccountOpen(true);
+    };
+
+    const handleCartClick = (event) => {
+        setCartAnchorEl(event.currentTarget);
+        setCartOpen(true);
+    };
+
+    const handleClose = () => {
+        setAccountOpen(false);
+        setCartOpen(false);
+    };
+
+    const handleIncreaseQuantity = (productId, stock, quantity) => {
+        setCartQuantities((prev) => ({
+            ...prev,
+            [productId]: (prev[productId] || quantity) < stock ? (prev[productId] || quantity) + 1 : stock,
+        }));
+    };
+
+    const handleDecreaseQuantity = (productId) => {
+        setCartQuantities((prev) => ({
+            ...prev,
+            [productId]: prev[productId] > 1 ? prev[productId] - 1 : 1,
+        }));
+    };
 
     const USER_MENU = [
         {
@@ -55,85 +94,25 @@ function Header() {
                 setAuth({
                     isAuthenticated: false,
                     user: {
+                        id: '',
                         email: '',
                         name: '',
                     },
                 });
-                hide();
+                setAccountOpen(false);
             },
             separate: true,
             value: 'logout',
         },
     ];
 
-    // console.log(auth);
-
-    // eslint-disable-next-line
-    const [activeTab, setActiveTab] = useState(-1);
-    const [activeDropdown, setActiveDropdown] = useState('');
-    const location = useLocation();
-    const slug = useParams();
-    const cartRef = useRef();
-    const dropdownCartRef = useRef();
-
-    const toggleDropdown = (dropdown) => {
-        setActiveDropdown((prev) => (prev === dropdown ? '' : dropdown));
-    };
-
-    const renderMenu = () => {
-        return USER_MENU.map((item, index) => {
-            return (
-                <Button
-                    key={index}
-                    className={cx('menu-option', {
-                        separate: item.separate,
-                    })}
-                    leftIcon={<span className={cx('menu-icon')}>{item.icon}</span>}
-                    // onClick={() => setSelectedValue(item.value)}
-                    to={item.to}
-                    onClick={item.clickAction}
-                >
-                    <span className={cx('menu-item--title')}>{item.title}</span>
-                </Button>
-            );
-        });
-    };
-
-    const renderResult = (attrs) => (
-        <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
-            <div className={cx('menu-popper')}>
-                {/* {history.length > 1 && <Header title={current.title} onBack={handleBack} />} */}
-                <div className={cx('menu-body')}>{renderMenu()}</div>
-            </div>
-        </div>
-    );
-
-    // Đóng dropdown khi click bên ngoài
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (activeDropdown) {
-                const isInsideCart =
-                    cartRef.current?.contains(event.target) || dropdownCartRef.current?.contains(event.target);
-
-                if (!isInsideCart) {
-                    setActiveDropdown('');
-                }
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [activeDropdown]);
-
-    useEffect(() => {
-        setActiveDropdown('');
-
         if (location.pathname === '/') {
             // Kiểm tra nếu trang hiện tại là trang chủ
             setActiveTab(-1); // Đặt lại activeTab thành -1 khi về trang chủ
         }
+        setAccountOpen(false);
+        setCartOpen(false);
     }, [location.pathname]);
 
     return (
@@ -147,25 +126,8 @@ function Header() {
                     <div className={cx('header-action')}>
                         <Search />
                         <div className={cx('header-action_account', 'header-action_item')}>
-                            {/* <div className={cx('dropdown')}>
-                                <div className={cx('menu-list')}>
-                                    <div className={cx('menu-body')}>{renderMenu()}</div>
-                                </div>
-                            </div> */}
-
-                            <Tippy
-                                visible={visible}
-                                interactive={true}
-                                onClickOutside={hide}
-                                delay={[0, 500]}
-                                placement="bottom-end"
-                                render={renderResult}
-                            >
-                                <Link
-                                    className={cx('header-action_text')}
-                                    to={auth.isAuthenticated ? null : '/login'}
-                                    onClick={auth.isAuthenticated ? (visible ? hide : show) : null}
-                                >
+                            <div onClick={auth.isAuthenticated ? handleAccountClick : null}>
+                                <Link className={cx('header-action_text')} to={auth.isAuthenticated ? null : '/login'}>
                                     <span className={cx('box-icon')}>
                                         <AccountIcon />
                                     </span>
@@ -184,74 +146,197 @@ function Header() {
                                         </span>
                                     )}
                                 </Link>
-                            </Tippy>
+                            </div>
+
+                            <DropDownMenu
+                                anchorEl={accountAnchorEl}
+                                open={accountOpen}
+                                handleClose={handleClose}
+                                width={205}
+                            >
+                                {USER_MENU.map((item, index) => (
+                                    <MenuItem
+                                        key={index}
+                                        onClick={item.clickAction}
+                                        className={cx('menu-option', {
+                                            separate: item.separate,
+                                        })}
+                                    >
+                                        <span className={cx('menu-icon')}>{item.icon}</span>
+                                        {item.title}
+                                    </MenuItem>
+                                ))}
+                            </DropDownMenu>
                         </div>
                         <div className={cx('header-action_cart', 'header-action_item')}>
-                            <div
-                                className={cx('header-action_text')}
-                                ref={cartRef}
-                                onClick={() => toggleDropdown('cart')}
-                            >
+                            <div className={cx('header-action_text')} onClick={handleCartClick}>
                                 <span className={cx('box-icon')}>
                                     <CartIcon />
                                     <span className={cx('count-holder')}>
-                                        <span className={cx('count')}>0</span>
+                                        <span className={cx('count')}>{countItems}</span>
                                     </span>
                                 </span>
                                 <span className={cx('box-text', 'text-center')}>
                                     <span className={cx('text-blow')}>Giỏ hàng</span>
                                 </span>
                             </div>
-                            <div className={cx('header-action_dropdown')} ref={dropdownCartRef}>
-                                {activeDropdown === 'cart' && (
-                                    <DropDownMenu className={cx('dropdown-cart')}>
-                                        <div className={cx('header-dropdown_content')}>
-                                            <p className={cx('box-title')}>Giỏ hàng</p>
-                                            <div className={cx('cart-view')}>
-                                                <div className={cx('cart-view-scroll')}>
-                                                    <div className={cx('cart-view_item')}>
-                                                        <table>
-                                                            <tbody>
-                                                                <tr className={cx('mini-cart__empty')}>
-                                                                    <td>
-                                                                        <div className={cx('shopping-cart-icon')}>
-                                                                            <ShoppingCartIcon />
+                            <DropDownMenu anchorEl={cartAnchorEl} open={cartOpen} handleClose={handleClose} width={480}>
+                                <div className={cx('header-dropdown_content')}>
+                                    <p className={cx('box-title')}>Giỏ hàng</p>
+                                    <div className={cx('cart-view')}>
+                                        <div className={cx('cart-view-scroll')}>
+                                            <div className={cx('cart-view_item')}>
+                                                <table>
+                                                    {cartItems?.items?.length > 0 ? (
+                                                        <tbody>
+                                                            {cartItems?.items?.map((cartItem, index) => (
+                                                                <tr className={cx('mini-cart__item')} key={index}>
+                                                                    <td className={cx('mini-cart__left')}>
+                                                                        <Link
+                                                                            to={`/products/${cartItem?.product?.slug}`}
+                                                                        >
+                                                                            <img
+                                                                                src={`${cartItem?.product?.image[0]}`}
+                                                                                alt={`${cartItem?.product?.name}`}
+                                                                            />
+                                                                        </Link>
+                                                                    </td>
+                                                                    <td className={cx('mini-cart__right')}>
+                                                                        <p className={cx('mini-cart__title')}>
+                                                                            <Link
+                                                                                to={`/products/${cartItem?.product?.slug}`}
+                                                                            >
+                                                                                {cartItem?.product?.name}
+                                                                            </Link>
+                                                                        </p>
+                                                                        <div className="d-flex justify-content-between align-items-center">
+                                                                            <div className={cx('mini-cart__quantity')}>
+                                                                                <div
+                                                                                    className={cx(
+                                                                                        'quantity',
+                                                                                        'd-flex',
+                                                                                        'align-items-center',
+                                                                                    )}
+                                                                                >
+                                                                                    <div
+                                                                                        className={cx('count-btn')}
+                                                                                        onClick={() =>
+                                                                                            handleDecreaseQuantity(
+                                                                                                cartItem?.product?._id,
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <FontAwesomeIcon
+                                                                                            icon={faMinus}
+                                                                                        />
+                                                                                    </div>
+                                                                                    <p className={cx('number')}>
+                                                                                        {cartQuantities[
+                                                                                            cartItem?.product?._id
+                                                                                        ] || cartItem?.quantity}
+                                                                                    </p>
+
+                                                                                    <div className={cx('counter')}>
+                                                                                        <div
+                                                                                            className={cx('count-btn')}
+                                                                                            onClick={() =>
+                                                                                                handleIncreaseQuantity(
+                                                                                                    cartItem?.product
+                                                                                                        ?._id,
+                                                                                                    cartItem?.product
+                                                                                                        ?.stock,
+                                                                                                    cartItem?.quantity,
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            <FontAwesomeIcon
+                                                                                                icon={faPlus}
+                                                                                            />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className={cx('mini-cart__price')}>
+                                                                                {/* {cartItem?.product?.priceFinal} */}
+                                                                                {new Intl.NumberFormat('en-US').format(
+                                                                                    cartItem?.product?.priceFinal *
+                                                                                        1000,
+                                                                                )}
+                                                                                ₫
+                                                                            </div>
                                                                         </div>
-                                                                        Hiện chưa có sản phẩm
+                                                                        <div className={cx('mini-cart__remove')}>
+                                                                            <Button
+                                                                                onlyIcon
+                                                                                leftIcon={
+                                                                                    <FontAwesomeIcon
+                                                                                        icon={faTrashCan}
+                                                                                    />
+                                                                                }
+                                                                            ></Button>
+                                                                        </div>
                                                                     </td>
                                                                 </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div className={cx('cart-view-line')}></div>
-                                            </div>
-                                            <div className={cx('cart-view-total')}>
-                                                <table className={cx('table-total')}>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td className={cx('total-title')}>TỔNG TIỀN:</td>
-                                                            <td className={cx('total-text')}>0₫</td>
-                                                        </tr>
-                                                        <tr className={cx('mini-cart__button')}>
-                                                            <td colSpan="2">
-                                                                <Button
-                                                                    to="/cart"
-                                                                    primary
-                                                                    small
-                                                                    className={cx('view-cart-btn')}
-                                                                >
-                                                                    Xem giỏ hàng
-                                                                </Button>
+                                                            ))}
+                                                        </tbody>
+                                                    ) : (
+                                                        <tbody>
+                                                            <tr className={cx('mini-cart__empty')}>
+                                                                <td>
+                                                                    <div className={cx('shopping-cart-icon')}>
+                                                                        <ShoppingCartIcon />
+                                                                    </div>
+                                                                    Hiện chưa có sản phẩm
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    )}
+                                                    {/* <tbody>
+                                                        <tr className={cx('mini-cart__empty')}>
+                                                            <td>
+                                                                <div className={cx('shopping-cart-icon')}>
+                                                                    <ShoppingCartIcon />
+                                                                </div>
+                                                                Hiện chưa có sản phẩm
                                                             </td>
                                                         </tr>
-                                                    </tbody>
+                                                    </tbody> */}
                                                 </table>
                                             </div>
                                         </div>
-                                    </DropDownMenu>
-                                )}
-                            </div>
+                                        <div className={cx('cart-view-line')}></div>
+                                    </div>
+                                    <div className={cx('cart-view-total')}>
+                                        <table className={cx('table-total')}>
+                                            <tbody>
+                                                <tr>
+                                                    <td className={cx('total-title')}>TỔNG TIỀN:</td>
+                                                    <td className={cx('total-text')}>
+                                                        {cartItems?.items?.length > 0
+                                                            ? new Intl.NumberFormat('en-US').format(
+                                                                  cartItems?.totalPriceFinal * 1000,
+                                                              )
+                                                            : 0}
+                                                        ₫
+                                                    </td>
+                                                </tr>
+                                                <tr className={cx('mini-cart__button')}>
+                                                    <td colSpan="2">
+                                                        <Button
+                                                            to="/cart"
+                                                            primary
+                                                            small
+                                                            className={cx('view-cart-btn')}
+                                                        >
+                                                            Xem giỏ hàng
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </DropDownMenu>
                         </div>
                     </div>
                 </div>

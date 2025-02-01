@@ -15,12 +15,14 @@ import styles from './LoginForm.module.scss';
 import Button from '~/components/Button';
 import { login } from '~/services/authService';
 import { AuthContext } from '~/contexts/AuthContext';
+import { CartContext } from '~/contexts/CartContext';
 
 const cx = classnames.bind(styles);
 
 function LoginForm() {
     const navigate = useNavigate();
-    const { setAuth } = useContext(AuthContext);
+    const { auth, setAuth } = useContext(AuthContext);
+    const { getCart } = useContext(CartContext);
     // const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
     const [error, setError] = useState('');
@@ -51,11 +53,15 @@ function LoginForm() {
             setAuth({
                 isAuthenticated: true,
                 user: {
+                    id: res?.user?.id ?? '',
                     email: res?.user?.email ?? '',
                     name: res?.user?.name ?? '',
                 },
             });
+            getCart();
             // console.log(res);
+            console.log(auth);
+
             navigate('/');
         } else {
             setError(res.EM);

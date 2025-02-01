@@ -8,7 +8,6 @@ import styles from './ProductDetail.module.scss';
 import ProductImagesSlider from '~/components/ProductImagesSlider';
 import Button from '~/components/Button';
 
-
 const cx = classnames.bind(styles);
 
 function ProductDetail() {
@@ -163,12 +162,12 @@ function ProductDetail() {
                                     <div className={cx('quantity', 'd-flex', 'align-items-center')}>
                                         <div className={cx('label')}>Số lượng:</div>
                                         <div className={cx('counter')}>
-                                            <div className={cx('count-btn')} onClick={handleIncreaseQuantity}>
-                                                <FontAwesomeIcon icon={faPlus} />
-                                            </div>
-                                            <p className={cx('number')}>{count}</p>
                                             <div className={cx('count-btn')} onClick={handleDecreaseQuantity}>
                                                 <FontAwesomeIcon icon={faMinus} />
+                                            </div>
+                                            <p className={cx('number')}>{count}</p>
+                                            <div className={cx('count-btn')} onClick={handleIncreaseQuantity}>
+                                                <FontAwesomeIcon icon={faPlus} />
                                             </div>
                                         </div>
                                     </div>
