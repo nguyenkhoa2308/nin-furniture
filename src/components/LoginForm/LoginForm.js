@@ -60,8 +60,6 @@ function LoginForm() {
             });
             getCart();
             // console.log(res);
-            console.log(auth);
-
             navigate('/');
         } else {
             setError(res.EM);

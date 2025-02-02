@@ -15,6 +15,12 @@ function DefaultLayout() {
 
     useEffect(() => {
         const fetchAccount = async () => {
+            const token = localStorage.getItem('access_token'); // Lấy token từ localStorage
+            if (!token) {
+                setAuth({ isAuthenticated: false, user: null });
+                return;
+            }
+
             try {
                 const res = await httpRequest.get(`user/account`);
                 if (res && !res.message) {
@@ -26,6 +32,8 @@ function DefaultLayout() {
                             name: res.name,
                         },
                     });
+                } else {
+                    console.log('Lỗi');
                 }
             } catch (error) {
                 // console.error('Failed to fetch account:', error);

@@ -257,7 +257,6 @@ function Header() {
                                                                                 </div>
                                                                             </div>
                                                                             <div className={cx('mini-cart__price')}>
-                                                                                {/* {cartItem?.product?.priceFinal} */}
                                                                                 {new Intl.NumberFormat('en-US').format(
                                                                                     cartItem?.product?.priceFinal *
                                                                                         1000,
@@ -291,16 +290,6 @@ function Header() {
                                                             </tr>
                                                         </tbody>
                                                     )}
-                                                    {/* <tbody>
-                                                        <tr className={cx('mini-cart__empty')}>
-                                                            <td>
-                                                                <div className={cx('shopping-cart-icon')}>
-                                                                    <ShoppingCartIcon />
-                                                                </div>
-                                                                Hiện chưa có sản phẩm
-                                                            </td>
-                                                        </tr>
-                                                    </tbody> */}
                                                 </table>
                                             </div>
                                         </div>
