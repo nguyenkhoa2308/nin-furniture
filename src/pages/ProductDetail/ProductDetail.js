@@ -123,9 +123,11 @@ function ProductDetail() {
                                             </del>
                                             <span className={cx('sale-percent')}>
                                                 -
-                                                {((product?.priceOriginal - product?.priceFinal) /
-                                                    product?.priceOriginal) *
-                                                    100}
+                                                {(
+                                                    ((product?.priceOriginal - product?.priceFinal) /
+                                                        product?.priceOriginal) *
+                                                    100
+                                                ).toFixed()}
                                                 %
                                             </span>
                                         </>

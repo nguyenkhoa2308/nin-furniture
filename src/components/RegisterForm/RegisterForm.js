@@ -265,16 +265,17 @@ function RegisterForm() {
                                     sx: {
                                         '.MuiTypography-root, .MuiPickersDay-root, .MuiPickersCalendarHeader-labelContainer':
                                             {
-                                                fontSize: '1rem', // Font size cho ngày
+                                                fontSize: '1.2rem', // Font size cho ngày
                                                 fontFamily: 'var(--font-family)',
                                                 fontWeight: '500',
                                             },
                                         '.MuiPickersCalendarHeader-labelContainer': {
-                                            fontSize: '1.3rem',
+                                            fontSize: '1.4rem',
                                         },
                                     },
                                 },
                             }}
+                            // defaultValue={dayjs()}
                             value={birthdayInput}
                             onOpen={handleOpen}
                             onChange={(newBirthday) => setBirthdayInput(newBirthday)}

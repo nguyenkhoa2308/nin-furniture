@@ -180,6 +180,11 @@
     text-transform: uppercase;
 }
 
+.original-price {
+    display: block;
+    font-weight: normal;
+}
+
 .counter {
     display: flex;
     align-items: center;
@@ -222,7 +227,7 @@
 
 .mini-cart__remove {
     position: absolute;
-    top: 10px;
+    top: 3px;
     right: 0px;
 }
 

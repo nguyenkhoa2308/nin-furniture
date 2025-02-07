@@ -1,6 +1,6 @@
 import classnames from 'classnames/bind';
 import { useState, useEffect, useContext } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressBook, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { MenuItem } from '@mui/material';
@@ -20,8 +20,8 @@ const HEADER_TAB = [
     { title: 'Sofa', slug: 'sofa' },
     { title: 'Bàn', slug: 'desk' },
     { title: 'Ghế', slug: 'chair' },
-    { title: 'Giường nệm', slug: 'beds-mattresses' },
-    { title: 'Chăn ga gối', slug: 'bedding' },
+    { title: 'Giường', slug: 'beds' },
+    // { title: 'Chăn ga gối', slug: 'bedding' },
     { title: 'Tủ kệ', slug: 'store-organization' },
     { title: 'Nội thất văn phòng', slug: 'office' },
     { title: 'Trang trí', slug: 'decor' },
@@ -31,6 +31,8 @@ const HEADER_TAB = [
 
 function Header() {
     const { auth, setAuth } = useContext(AuthContext);
+    const { cartItems, countItems, deleteCartItem, updateQuantityOfCartItem } = useContext(CartContext);
+    const navigate = useNavigate();
 
     const slug = useParams();
     const location = useLocation();
@@ -41,9 +43,7 @@ function Header() {
     const [accountOpen, setAccountOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
     const [cartQuantities, setCartQuantities] = useState({});
-
-    // eslint-disable-next-line
-    const { cartItems, countItems } = useContext(CartContext);
+    const [pendingUpdate, setPendingUpdate] = useState(null);
 
     const handleAccountClick = (event) => {
         setAccountAnchorEl(event.currentTarget);
@@ -60,19 +60,48 @@ function Header() {
         setCartOpen(false);
     };
 
-    const handleIncreaseQuantity = (productId, stock, quantity) => {
+    const handleUpdate = (productId, quantity, cartItemId) => {
         setCartQuantities((prev) => ({
             ...prev,
-            [productId]: (prev[productId] || quantity) < stock ? (prev[productId] || quantity) + 1 : stock,
+            [productId]: quantity,
         }));
+        // updateQuantityOfCartItem(quantity, cartItemId); // Gọi API để cập nhật số lượng
+        setPendingUpdate({ productId, cartItemId });
     };
 
-    const handleDecreaseQuantity = (productId) => {
-        setCartQuantities((prev) => ({
-            ...prev,
-            [productId]: prev[productId] > 1 ? prev[productId] - 1 : 1,
-        }));
+    const handleIncreaseQuantity = (productId, stock, quantity, cartItemId) => {
+        const newQuantity = (cartQuantities[productId] || quantity) + 1;
+
+        // Chỉ tăng số lượng nếu newQuantity <= stock
+        if (newQuantity <= stock) {
+            handleUpdate(productId, newQuantity, cartItemId); // Gọi API để cập nhật số lượng
+        }
     };
+
+    const handleDecreaseQuantity = (productId, quantity, cartItemId) => {
+        const currentQuantity = cartQuantities[productId] || quantity;
+
+        const newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
+
+        // Chỉ giảm số lượng nếu newQuantity < currentQuantity
+        if (newQuantity !== currentQuantity) {
+            // Kiểm tra nếu số lượng thay đổi
+            handleUpdate(productId, newQuantity, cartItemId); // Gọi API để cập nhật số lượng
+        }
+    };
+
+    // Dùng useEffect để gọi API sau 0.5s nếu không có thay đổi
+    useEffect(() => {
+        if (!pendingUpdate) return;
+
+        const timer = setTimeout(() => {
+            const { productId, cartItemId } = pendingUpdate;
+            updateQuantityOfCartItem(cartQuantities[productId], cartItemId);
+            setPendingUpdate(null);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [pendingUpdate, cartQuantities, updateQuantityOfCartItem]);
 
     const USER_MENU = [
         {
@@ -80,11 +109,17 @@ function Header() {
             icon: <FontAwesomeIcon icon={faUser} />,
             to: '/account',
             value: 'view-profile',
+            clickAction: () => {
+                navigate('/account');
+            },
         },
         {
             title: 'Danh sách địa chỉ',
             icon: <FontAwesomeIcon icon={faAddressBook} />,
             value: 'address-list',
+            clickAction: () => {
+                navigate('/account/addresses');
+            },
         },
         {
             title: 'Đăng xuất',
@@ -100,6 +135,7 @@ function Header() {
                     },
                 });
                 setAccountOpen(false);
+                navigate('/');
             },
             separate: true,
             value: 'logout',
@@ -135,7 +171,7 @@ function Header() {
                                         <span className={cx('box-text')}>
                                             Tài khoản của
                                             <span className={cx('text-blow')}>
-                                                {auth.user.name}{' '}
+                                                {auth.user.name}
                                                 <FontAwesomeIcon icon={faAngleDown} className={cx('angle-down-icon')} />
                                             </span>
                                         </span>
@@ -223,6 +259,8 @@ function Header() {
                                                                                         onClick={() =>
                                                                                             handleDecreaseQuantity(
                                                                                                 cartItem?.product?._id,
+                                                                                                cartItem?.quantity,
+                                                                                                cartItem?._id,
                                                                                             )
                                                                                         }
                                                                                     >
@@ -246,6 +284,7 @@ function Header() {
                                                                                                     cartItem?.product
                                                                                                         ?.stock,
                                                                                                     cartItem?.quantity,
+                                                                                                    cartItem?._id,
                                                                                                 )
                                                                                             }
                                                                                         >
@@ -262,6 +301,21 @@ function Header() {
                                                                                         1000,
                                                                                 )}
                                                                                 ₫
+                                                                                {cartItem?.product?.priceFinal !==
+                                                                                    cartItem?.product
+                                                                                        ?.priceOriginal && (
+                                                                                    <del
+                                                                                        className={cx('original-price')}
+                                                                                    >
+                                                                                        {new Intl.NumberFormat(
+                                                                                            'en-US',
+                                                                                        ).format(
+                                                                                            cartItem?.product
+                                                                                                ?.priceOriginal * 1000,
+                                                                                        )}
+                                                                                        ₫
+                                                                                    </del>
+                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                         <div className={cx('mini-cart__remove')}>
@@ -271,6 +325,9 @@ function Header() {
                                                                                     <FontAwesomeIcon
                                                                                         icon={faTrashCan}
                                                                                     />
+                                                                                }
+                                                                                onClick={() =>
+                                                                                    deleteCartItem(cartItem?._id)
                                                                                 }
                                                                             ></Button>
                                                                         </div>

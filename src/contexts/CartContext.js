@@ -26,7 +26,6 @@ export const CartProvider = ({ children }) => {
             const countItem = items.reduce((prev, item) => {
                 return prev + item.quantity;
             }, 0);
-            console.log('>> item', items);
 
             setCountItems(countItem);
         } catch (error) {
@@ -72,6 +71,35 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const deleteCartItem = async (cartItemId) => {
+        try {
+            const response = await httpRequest.delete(`cart/delete/${cartItemId}`);
+            if (response.EC === 0) {
+                getCart();
+            } else {
+                console.log('Error delete');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const updateQuantityOfCartItem = async (quantity, cartItemId) => {
+        try {
+            const response = await httpRequest.put(`cart/updateQuantity/`, {
+                quantity: quantity,
+                cartItemId: cartItemId,
+            });
+            if (response.EC === 0) {
+                getCart();
+            } else {
+                console.log('Error update');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
         if (auth?.user?.id) {
             getCart();
@@ -82,6 +110,10 @@ export const CartProvider = ({ children }) => {
     }, [auth]);
 
     return (
-        <CartContext.Provider value={{ cartItems, countItems, getCart, addToCart }}>{children}</CartContext.Provider>
+        <CartContext.Provider
+            value={{ cartItems, countItems, getCart, addToCart, deleteCartItem, updateQuantityOfCartItem }}
+        >
+            {children}
+        </CartContext.Provider>
     );
 };
