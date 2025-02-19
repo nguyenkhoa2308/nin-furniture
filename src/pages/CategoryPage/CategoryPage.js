@@ -1,31 +1,33 @@
 import classnames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faCheck, faX } from '@fortawesome/free-solid-svg-icons';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
 
 import styles from './CategoryPage.module.scss';
 import Button from '~/components/Button';
-import { useEffect, useState, useCallback } from 'react';
 import ProductList from '~/components/ProductList';
-import { useParams } from 'react-router-dom';
+import httpRequest from '~/utils/httpRequest';
+import { ToastContainer } from 'react-toastify';
 
 const cx = classnames.bind(styles);
 
 const SORT_MENU = [
     {
         title: 'Giá: Tăng dần',
-        value: 'price-asc',
+        value: 'price_asc',
     },
     {
         title: 'Giá: Giảm dần',
-        value: 'price-desc',
+        value: 'price_desc',
     },
     {
         title: 'Tên: A - Z',
-        value: 'name-asc',
+        value: 'name_asc',
     },
     {
         title: 'Tên: Z - A',
-        value: 'name-desc',
+        value: 'name_desc',
     },
     {
         title: 'Cũ nhất',
@@ -37,15 +39,27 @@ const SORT_MENU = [
     },
     {
         title: 'Bán chạy nhất',
-        value: 'best-seller',
+        value: 'best_seller',
     },
 ];
 
+const priceOptions = [
+    { label: 'Dưới 1.000.000₫', value: '<1000000' },
+    { label: '1.000.000₫ - 2.000.000₫', value: '1000000-2000000' },
+    { label: '2.000.000₫ - 3.000.000₫', value: '2000000-3000000' },
+    { label: '3.000.000₫ - 4.000.000₫', value: '3000000-4000000' },
+    { label: 'Trên 4.000.000₫', value: '>4000000' },
+];
+
 function CategoryPage() {
-    const [selectedValue, setSelectedValue] = useState('price-asc');
+    const [selectedValue, setSelectedValue] = useState('price_asc');
     const [productCount, setProductCount] = useState(0); // Để lưu số lượng sản phẩm
     const [brands, setBrands] = useState([]);
+    const [selectedBrands, setSelectedBrands] = useState([]);
+    const [selectedPrices, setSelectedPrices] = useState([]);
     const [category, setCategory] = useState('');
+
+
     const slug = useParams();
 
     // Callback function để nhận số lượng sản phẩm từ ProductList
@@ -57,16 +71,29 @@ function CategoryPage() {
         setBrands(brands);
     }, []);
 
+    // Xử lý khi chọn brand
+    const handleBrandSelect = (brand) => {
+        setSelectedBrands((prevSelected) =>
+            prevSelected.includes(brand) ? prevSelected.filter((item) => item !== brand) : [...prevSelected, brand],
+        );
+    };
+
+    // Xử lý khi chọn khoảng giá
+    const handlePriceSelect = (priceRange) => {
+        setSelectedPrices((prevSelected) =>
+            prevSelected.includes(priceRange)
+                ? prevSelected.filter((item) => item !== priceRange)
+                : [...prevSelected, priceRange],
+        );
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:410/api/categories/${slug.slug}`); // Gọi API danh mục
-                const data = await response.json(); // Chuyển đổi response thành JSON
-                setCategory(data);
+                const res = await httpRequest.get(`categories/${slug.slug}`);
+                setCategory(res);
             } catch (err) {
                 console.log(err);
-            } finally {
-                // setLoading(false);
             }
         };
 
@@ -113,6 +140,8 @@ function CategoryPage() {
                                                     id={`data-brand-${index}`}
                                                     value={item}
                                                     className={cx('input-field')}
+                                                    checked={selectedBrands.includes(item)}
+                                                    onChange={() => handleBrandSelect(item)}
                                                 />
                                                 <label className={cx('checkbox-label')} htmlFor={`data-brand-${index}`}>
                                                     {item}
@@ -132,32 +161,20 @@ function CategoryPage() {
                             </div>
                             <div className={cx('filter-group-content')}>
                                 <ul className={cx('checkbox-list')}>
-                                    <li className={cx('checkbox-item')}>
-                                        <input type="checkbox" id="p1" className={cx('input-field')} />
-                                        <label className={cx('checkbox-label')} htmlFor="p1">
-                                            <span>Dưới</span>
-                                            {' 1.000.000₫'}
-                                        </label>
-                                    </li>
-                                    <li className={cx('checkbox-item')}>
-                                        <input type="checkbox" id="p2" className={cx('input-field')} />
-                                        <label className={cx('checkbox-label')} htmlFor="p2">
-                                            1.000.000₫ - 2.000.000₫
-                                        </label>
-                                    </li>
-                                    <li className={cx('checkbox-item')}>
-                                        <input type="checkbox" id="p3" className={cx('input-field')} />
-                                        <label className={cx('checkbox-label')} htmlFor="p3">
-                                            2.000.000₫ - 3.000.000₫
-                                        </label>
-                                    </li>
-                                    <li className={cx('checkbox-item')}>
-                                        <input type="checkbox" id="p4" className={cx('input-field')} />
-                                        <label className={cx('checkbox-label')} htmlFor="p4">
-                                            <span>Trên</span>
-                                            {' 4.000.000₫'}
-                                        </label>
-                                    </li>
+                                    {priceOptions.map((price, index) => (
+                                        <li className={cx('checkbox-item')} key={index}>
+                                            <input
+                                                type="checkbox"
+                                                id={`price-${index}`}
+                                                className={cx('input-field')}
+                                                checked={selectedPrices.includes(price.value)}
+                                                onChange={() => handlePriceSelect(price.value)}
+                                            />
+                                            <label className={cx('checkbox-label')} htmlFor={`price-${index}`}>
+                                                {price.label}
+                                            </label>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </div>
@@ -193,13 +210,72 @@ function CategoryPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className={cx('filter-tags')}></div>
+                        <div className={cx('filter-tags')}>
+                            <div
+                                className={cx('brand-tags', {
+                                    opened: selectedBrands.length > 0,
+                                })}
+                            >
+                                Nhà cung cấp:{' '}
+                                <b>
+                                    {selectedBrands.map((value, index) => {
+                                        return (
+                                            <span key={index}>
+                                                {index >= 1 ? ', ' : ''} {value}
+                                            </span>
+                                        );
+                                    })}
+                                </b>
+                                <span className={cx('remove-tag')} onClick={() => setSelectedBrands([])}>
+                                    <FontAwesomeIcon icon={faX} />
+                                </span>
+                            </div>
+                            <div
+                                className={cx('price-tags', {
+                                    opened: selectedPrices.length > 0,
+                                })}
+                            >
+                                Giá:{' '}
+                                <b>
+                                    {selectedPrices.map((value, index) => {
+                                        const label = priceOptions.find((p) => p.value === value)?.label;
+                                        return (
+                                            <span key={index}>
+                                                {index >= 1 ? ', ' : ''} {label}
+                                            </span>
+                                        );
+                                    })}
+                                </b>
+                                <span className={cx('remove-tag')} onClick={() => setSelectedPrices([])}>
+                                    <FontAwesomeIcon icon={faX} />
+                                </span>
+                            </div>
+                            <div
+                                className={cx('remove-all-tags', {
+                                    opened: selectedBrands.length > 0 && selectedPrices.length > 0,
+                                })}
+                                onClick={() => {
+                                    setSelectedPrices([]);
+                                    setSelectedBrands([]);
+                                }}
+                            >
+                                <span>Xóa hết</span>
+                            </div>
+                        </div>
                     </div>
                     <div className={cx('list-product')}>
-                        <ProductList onProductCountChange={handleProductCount} onBrandChange={handleBrandChange} />
+                        <ProductList
+                            onProductCountChange={handleProductCount}
+                            onBrandChange={handleBrandChange}
+                            sortBy={selectedValue}
+                            selectedBrands={selectedBrands}
+                            selectedPrices={selectedPrices}
+                        />
                     </div>
                 </div>
             </div>
+
+            <ToastContainer />
         </div>
     );
 }

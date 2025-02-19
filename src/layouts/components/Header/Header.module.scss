@@ -169,11 +169,19 @@
     }
 }
 
-// .mini-cart__title {
-//     padding-bottom: 10px;
-// }
+.mnc-link {
+    display: block;
+    font-size: 1.2rem;
+    margin-right: 50px;
+}
 
-.mini-cart__title,
+.mnc-variant {
+    display: block;
+    font-size: 1.3rem;
+    margin: 0px 0 7px;
+}
+
+.mnc-link,
 .mini-cart__price {
     color: var(--shop-color-text);
     font-weight: bold;

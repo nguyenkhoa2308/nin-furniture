@@ -13,6 +13,8 @@ import Profile from './pages/Profile';
 import { AuthContext } from '~/contexts/AuthContext';
 import httpRequest from '~/utils/httpRequest';
 import PurchasePage from './pages/PurchasePage';
+import Cart from './pages/Cart';
+import CheckOut from './pages/CheckOut';
 
 function App() {
     const { setAuth } = useContext(AuthContext);
@@ -61,6 +63,8 @@ function App() {
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<SignUp />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="checkout" element={<CheckOut />} />
                 </Route>
                 <Route path="account" element={<AccountLayout />}>
                     <Route path="" element={<Profile />}></Route>

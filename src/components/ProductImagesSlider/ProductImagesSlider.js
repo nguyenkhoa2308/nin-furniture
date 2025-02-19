@@ -1,5 +1,5 @@
 // import classnames from 'classnames/bind';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Navigation, Thumbs, Autoplay } from 'swiper/modules';
@@ -14,21 +14,35 @@ import './style.scss';
 
 // const cx = classnames.bind(styles);
 
-function ProductImagesSlider({ images }) {
-    const [activeImage, setActiveImage] = useState(0);
+function ProductImagesSlider({ images, variantIndex }) {
+    const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const [mainSwiper, setMainSwiper] = useState(null);
+    const [activeIndex, setActiveIndex] = useState(variantIndex || 0);
+
+    // Khi variantIndex thay đổi, chuyển cả thumb gallery và ảnh lớn
+    useEffect(() => {
+        if (thumbsSwiper && variantIndex !== null) {
+            thumbsSwiper.slideTo(variantIndex);
+        }
+        if (mainSwiper && variantIndex !== null) {
+            mainSwiper.slideTo(variantIndex);
+        }
+    }, [variantIndex, thumbsSwiper, mainSwiper]);
 
     return (
         <div className="wrapper-swiper">
             <Swiper
+                onSwiper={setMainSwiper}
                 loop={false}
                 spaceBetween={10}
                 navigation={true}
-                thumbs={{ swiper: activeImage }}
+                thumbs={{ swiper: thumbsSwiper }}
                 modules={[FreeMode, Navigation, Thumbs, Autoplay]}
                 autoplay={{
                     delay: 3000,
                     disableOnInteraction: false,
                 }}
+                onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
                 className="gallery-slider"
             >
                 {images.map((item, index) => {
@@ -40,7 +54,7 @@ function ProductImagesSlider({ images }) {
                 })}
             </Swiper>
             <Swiper
-                onSwiper={setActiveImage}
+                onSwiper={setThumbsSwiper}
                 loop={false}
                 spaceBetween={10}
                 slidesPerView={4}
@@ -51,7 +65,7 @@ function ProductImagesSlider({ images }) {
             >
                 {images.map((item, index) => {
                     return (
-                        <SwiperSlide key={index}>
+                        <SwiperSlide key={index} className={index === activeIndex ? 'active-thumb' : ''}>
                             <img src={item} alt={`thumb ${index}`} />
                         </SwiperSlide>
                     );

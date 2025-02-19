@@ -60,34 +60,42 @@ function Header() {
         setCartOpen(false);
     };
 
-    const handleUpdate = (productId, quantity, cartItemId) => {
+    const handleUpdate = (quantity, cartItemId) => {
         setCartQuantities((prev) => ({
             ...prev,
-            [productId]: quantity,
+            [cartItemId]: quantity,
         }));
+
         // updateQuantityOfCartItem(quantity, cartItemId); // Gọi API để cập nhật số lượng
-        setPendingUpdate({ productId, cartItemId });
+        setPendingUpdate({ cartItemId });
     };
 
-    const handleIncreaseQuantity = (productId, stock, quantity, cartItemId) => {
-        const newQuantity = (cartQuantities[productId] || quantity) + 1;
+    const handleIncreaseQuantity = (stock, quantity, cartItemId) => {
+        const newQuantity = (cartQuantities[cartItemId] || quantity) + 1;
 
         // Chỉ tăng số lượng nếu newQuantity <= stock
         if (newQuantity <= stock) {
-            handleUpdate(productId, newQuantity, cartItemId); // Gọi API để cập nhật số lượng
+            handleUpdate(newQuantity, cartItemId); // Gọi API để cập nhật số lượng
         }
     };
 
-    const handleDecreaseQuantity = (productId, quantity, cartItemId) => {
-        const currentQuantity = cartQuantities[productId] || quantity;
+    const handleDecreaseQuantity = (quantity, cartItemId) => {
+        const currentQuantity = cartQuantities[cartItemId] || quantity;
 
         const newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
 
         // Chỉ giảm số lượng nếu newQuantity < currentQuantity
         if (newQuantity !== currentQuantity) {
             // Kiểm tra nếu số lượng thay đổi
-            handleUpdate(productId, newQuantity, cartItemId); // Gọi API để cập nhật số lượng
+            handleUpdate(newQuantity, cartItemId); // Gọi API để cập nhật số lượng
         }
+    };
+
+    const handleRemoveItem = (cartItem) => {
+        // eslint-disable-next-line
+        const delItemId = cartItem._id;
+        delete cartItems.delItemId;
+        deleteCartItem(cartItem._id);
     };
 
     // Dùng useEffect để gọi API sau 0.5s nếu không có thay đổi
@@ -95,8 +103,8 @@ function Header() {
         if (!pendingUpdate) return;
 
         const timer = setTimeout(() => {
-            const { productId, cartItemId } = pendingUpdate;
-            updateQuantityOfCartItem(cartQuantities[productId], cartItemId);
+            const { cartItemId } = pendingUpdate;
+            updateQuantityOfCartItem(cartQuantities[cartItemId], cartItemId);
             setPendingUpdate(null);
         }, 500);
 
@@ -232,7 +240,7 @@ function Header() {
                                                                             to={`/products/${cartItem?.product?.slug}`}
                                                                         >
                                                                             <img
-                                                                                src={`${cartItem?.product?.image[0]}`}
+                                                                                src={`${cartItem?.product?.image}`}
                                                                                 alt={`${cartItem?.product?.name}`}
                                                                             />
                                                                         </Link>
@@ -240,10 +248,18 @@ function Header() {
                                                                     <td className={cx('mini-cart__right')}>
                                                                         <p className={cx('mini-cart__title')}>
                                                                             <Link
+                                                                                className={cx('mnc-link')}
                                                                                 to={`/products/${cartItem?.product?.slug}`}
                                                                             >
                                                                                 {cartItem?.product?.name}
                                                                             </Link>
+                                                                            {!(
+                                                                                cartItem?.variant?.name === 'default'
+                                                                            ) && (
+                                                                                <span className={cx('mnc-variant')}>
+                                                                                    {cartItem?.variant?.name}
+                                                                                </span>
+                                                                            )}
                                                                         </p>
                                                                         <div className="d-flex justify-content-between align-items-center">
                                                                             <div className={cx('mini-cart__quantity')}>
@@ -258,7 +274,6 @@ function Header() {
                                                                                         className={cx('count-btn')}
                                                                                         onClick={() =>
                                                                                             handleDecreaseQuantity(
-                                                                                                cartItem?.product?._id,
                                                                                                 cartItem?.quantity,
                                                                                                 cartItem?._id,
                                                                                             )
@@ -270,28 +285,24 @@ function Header() {
                                                                                     </div>
                                                                                     <p className={cx('number')}>
                                                                                         {cartQuantities[
-                                                                                            cartItem?.product?._id
+                                                                                            cartItem?._id
                                                                                         ] || cartItem?.quantity}
                                                                                     </p>
 
-                                                                                    <div className={cx('counter')}>
-                                                                                        <div
-                                                                                            className={cx('count-btn')}
-                                                                                            onClick={() =>
-                                                                                                handleIncreaseQuantity(
-                                                                                                    cartItem?.product
-                                                                                                        ?._id,
-                                                                                                    cartItem?.product
-                                                                                                        ?.stock,
-                                                                                                    cartItem?.quantity,
-                                                                                                    cartItem?._id,
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            <FontAwesomeIcon
-                                                                                                icon={faPlus}
-                                                                                            />
-                                                                                        </div>
+                                                                                    <div
+                                                                                        className={cx('count-btn')}
+                                                                                        onClick={() =>
+                                                                                            handleIncreaseQuantity(
+                                                                                                cartItem?.product
+                                                                                                    ?.stock,
+                                                                                                cartItem?.quantity,
+                                                                                                cartItem?._id,
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <FontAwesomeIcon
+                                                                                            icon={faPlus}
+                                                                                        />
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -327,7 +338,7 @@ function Header() {
                                                                                     />
                                                                                 }
                                                                                 onClick={() =>
-                                                                                    deleteCartItem(cartItem?._id)
+                                                                                    handleRemoveItem(cartItem)
                                                                                 }
                                                                             ></Button>
                                                                         </div>

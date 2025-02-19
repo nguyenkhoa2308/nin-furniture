@@ -20,6 +20,30 @@
     --search-btn-width: 70px;
 }
 
+.search-result__item {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: min(-156px + 100vh, 590px);
+    // min-height: 100px;
+    background: var(--white);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 12px;
+    border-radius: 8px;
+    // padding: 8px 0;
+}
+
+.view-more {
+    color: var(--shop-color-text);
+    text-align: center;
+    cursor: pointer;
+    margin-top: 8px;
+    margin-bottom: 8px;
+
+    &:hover {
+        color: var(--primary);
+    }
+}
+
 .search {
     position: relative;
     border-radius: 4px;

@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import httpRequest from '~/utils/httpRequest';
 import { AuthContext } from '~/contexts/AuthContext';
+import { Zoom, toast } from 'react-toastify';
 
 export const CartContext = createContext({
     isAuthenticated: false,
@@ -33,41 +34,64 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    const addToCart = async (productId, quantity) => {
+    const addToCart = async (productId, quantity, variantId) => {
         try {
             const response = await httpRequest.post('cart/add', {
                 productId,
+                variantId,
                 quantity,
             });
 
+            // console.log(response);
+
             if (response.EC === 0) {
-                // toast.success('Thêm vào giỏ hàng thành công!', {
-                //     position: "top-right",
-                //     autoClose: 3000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: false,
-                //     draggable: false,
-                //     progress: undefined,
-                //     theme: "light",
-                // });
+                toast.success('Thêm vào giỏ hàng thành công!', {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                });
                 getCart();
                 console.log('Successful');
             } else {
-                // toast.error('Thêm vào giỏ hàng thất bại!', {
-                //     position: "top-right",
-                //     autoClose: 3000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "light",
-                // });
+                toast.error(`Thêm vào giỏ hàng thất bại! ${response.message}`, {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                });
                 console.log('Unsuccessful');
             }
         } catch (error) {
-            console.log(error);
+            // console.log(error);
+            toast.error(
+                <div>
+                    Thêm vào giỏ hàng thất bại! <br />
+                    {error.response.data.message}
+                </div>,
+                {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                },
+            );
+            console.log('Unsuccessful');
         }
     };
 

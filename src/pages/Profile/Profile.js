@@ -60,7 +60,7 @@ function Profile() {
             // navigate('/');
             toast.success('Sửa thông tin người dùng thành công!', {
                 position: 'top-right',
-                autoClose: 2000,
+                autoClose: 1500,
                 hideProgressBar: false,
                 closeOnClick: false,
                 pauseOnHover: false,
@@ -73,7 +73,7 @@ function Profile() {
             console.log('Error');
             toast.error('Sửa thông tin người dùng thất bại!', {
                 position: 'top-right',
-                autoClose: 2000,
+                autoClose: 1500,
                 hideProgressBar: false,
                 closeOnClick: false,
                 pauseOnHover: false,

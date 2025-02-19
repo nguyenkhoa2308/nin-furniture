@@ -1,12 +1,10 @@
 .wrapper {
-    margin-bottom: 32px;
-    margin-top: 16px;
+    display: flex;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 .sticky-gallery {
-    top: 30px;
-    position: sticky;
-    transition: top 400ms ease;
     background: var(--white);
 }
 
@@ -230,34 +228,4 @@
             transition: all 0.5s ease;
         }
     }
-}
-
-.description {
-    margin-top: 15px;
-    background-color: var(--white);
-    padding: 15px;
-}
-
-.description-title {
-    display: inline-block;
-    color: var(--primary);
-    font-size: 1.6rem;
-    margin-bottom: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    position: relative;
-
-    &::before {
-        position: absolute;
-        content: '';
-        width: 100%;
-        height: 2px;
-        background: var(--primary);
-        bottom: -12px;
-        left: 0;
-    }
-}
-
-.description-content {
-    padding-top: 20px;
 }

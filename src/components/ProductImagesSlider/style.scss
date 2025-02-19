@@ -73,8 +73,8 @@
         border: 1px solid #e7e7e7;
     }
 
-    .swiper-slide-thumb-active {
+    .active-thumb {
+        border: 1px solid var(--primary); // 🔥 Thay đổi màu viền theo ý thích
         opacity: 1;
-        border: 1px solid var(--primary);
     }
 }
