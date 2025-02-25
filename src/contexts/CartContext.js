@@ -124,6 +124,68 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const addMultipleToCart = async (items) => {
+        try {
+            const response = await httpRequest.post('cart/add-multiple', {
+                items,
+            });
+            getCart();
+
+            if (response.status === 200) {
+                toast.success('Thêm vào giỏ hàng thành công!', {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                });
+                console.log('Successful');
+            } else {
+                toast.error(
+                    <div>
+                        Thêm vào giỏ hàng thất bại! <br />
+                        {response.message}
+                    </div>,
+                    {
+                        position: 'top-right',
+                        autoClose: 1500,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        progress: undefined,
+                        theme: 'light',
+                        transition: Zoom,
+                    },
+                );
+                console.warn('Có một số lỗi khi thêm vào giỏ hàng:');
+            }
+        } catch (error) {
+            toast.error(
+                <div>
+                    Thêm vào giỏ hàng thất bại! <br />
+                    {error.response.data.message}
+                </div>,
+                {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                },
+            );
+            console.error('Lỗi khi thêm nhiều sản phẩm vào giỏ hàng:', error);
+        }
+    };
+
     useEffect(() => {
         if (auth?.user?.id) {
             getCart();
@@ -135,7 +197,17 @@ export const CartProvider = ({ children }) => {
 
     return (
         <CartContext.Provider
-            value={{ cartItems, countItems, getCart, addToCart, deleteCartItem, updateQuantityOfCartItem }}
+            value={{
+                cartItems,
+                countItems,
+                setCartItems,
+                setCountItems,
+                getCart,
+                addToCart,
+                addMultipleToCart,
+                deleteCartItem,
+                updateQuantityOfCartItem,
+            }}
         >
             {children}
         </CartContext.Provider>

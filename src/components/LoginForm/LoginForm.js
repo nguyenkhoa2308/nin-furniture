@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { ToastContainer, Zoom, toast } from 'react-toastify';
+import { Spinner } from 'react-bootstrap';
 
 // Material UI Imports
 import { TextField, InputAdornment, FormControl, InputLabel, IconButton, OutlinedInput } from '@mui/material';
@@ -16,6 +18,8 @@ import Button from '~/components/Button';
 import { login } from '~/services/authService';
 import { AuthContext } from '~/contexts/AuthContext';
 import { CartContext } from '~/contexts/CartContext';
+import { useAddress } from '~/contexts/AddressContext';
+import httpRequest from '~/utils/httpRequest';
 
 const cx = classnames.bind(styles);
 
@@ -23,9 +27,11 @@ function LoginForm() {
     const navigate = useNavigate();
     const { setAuth } = useContext(AuthContext);
     const { getCart } = useContext(CartContext);
+    const { getAddresses } = useAddress();
     // const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     //Inputs
     const [emailInput, setEmailInput] = useState('');
@@ -56,9 +62,11 @@ function LoginForm() {
                     id: res?.user?.id ?? '',
                     email: res?.user?.email ?? '',
                     name: res?.user?.name ?? '',
+                    role: res?.user?.role ?? '',
                 },
             });
             getCart();
+            getAddresses();
             // console.log(res);
             navigate('/');
         } else {
@@ -67,9 +75,71 @@ function LoginForm() {
     };
 
     const handleKeyDown = (event) => {
-        if (event.key === 'Enter' && emailInput && passwordInput) {
+        if (event.key === 'Enter') {
             event.preventDefault(); // Ngừng hành động mặc định của Enter
-            handleLogin(); // Gọi hàm đăng nhập nếu có đủ thông tin
+            if (isForgotPassword && forgotEmail) {
+                handleForgotPassword();
+            }
+            if (!isForgotPassword && emailInput && passwordInput) {
+                handleLogin();
+            } // Gọi hàm đăng nhập nếu có đủ thông tin
+        }
+    };
+
+    const handleBackLogin = () => {
+        setEmailInput('');
+        setForgotEmail('');
+        setPasswordInput('');
+        setIsForgotPassword(false);
+    };
+
+    const handleForgotPassword = async () => {
+        setLoading(true);
+        try {
+            const res = await httpRequest.post('/user/forgot-password', {
+                email: forgotEmail,
+            });
+
+            if (res.status === 200) {
+                setIsForgotPassword(false);
+                setForgotEmail('');
+
+                toast.success(
+                    <div>
+                        Gửi Email thành công <br /> Vui lòng kiểm tra trong hòm thư email!
+                    </div>,
+                    {
+                        position: 'top-right',
+                        autoClose: 1500,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: false,
+                        draggable: true,
+                        progress: undefined,
+                        theme: 'light',
+                        transition: Zoom,
+                    },
+                );
+            }
+        } catch (error) {
+            toast.error(
+                <div>
+                    Gửi Email thất bại <br /> Do {error.response.data.message}!
+                </div>,
+                {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                },
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -181,7 +251,7 @@ function LoginForm() {
                     </div>
                 )}
                 {isForgotPassword && (
-                    <div className={cx('forget-password-container')}>
+                    <div className={cx('forget-password-container')} onKeyDown={handleKeyDown}>
                         <TextField
                             label="Email"
                             placeholder="Vui lòng nhập email của bạn"
@@ -213,20 +283,22 @@ function LoginForm() {
                         <Button
                             primary
                             className={cx('send-email-btn', {
-                                disabled: !emailInput,
+                                disabled: !forgotEmail,
                             })}
+                            onClick={() => handleForgotPassword()}
                         >
-                            Gửi email
+                            {loading ? <Spinner animation="border" className="mt-3" /> : <span> Gửi email</span>}
                         </Button>
                         <p className={cx('login-text')}>
                             Quay lại
-                            <span to="/login" className={cx('login-link')} onClick={() => setIsForgotPassword(false)}>
+                            <span to="/login" className={cx('login-link')} onClick={() => handleBackLogin()}>
                                 đăng nhập
                             </span>
                         </p>
                     </div>
                 )}
             </div>
+            <ToastContainer />
         </div>
     );
 }

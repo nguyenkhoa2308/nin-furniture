@@ -1,12 +1,12 @@
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeadlessTippy from '@tippyjs/react/headless';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faXmarkCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-// import { Wrapper as PopperWrapper } from '~/components/Popper';
-import { useDebounce } from '~/hooks';
 import styles from './Search.module.scss';
+import { useDebounce } from '~/hooks';
 import * as searchService from '~/services/searchService';
 import ProductItem from '~/components/ProductItem';
 
@@ -18,10 +18,10 @@ function Search() {
     const [showResult, setShowResult] = useState(false);
     const [visibleCount, setVisibleCount] = useState(0);
     const [loading, setLoading] = useState(false);
-
-    const debouncedValue = useDebounce(searchValue, 500);
+    const navigate = useNavigate();
 
     const inputRef = useRef();
+    const debouncedValue = useDebounce(searchValue, 500);
 
     useEffect(() => {
         if (!debouncedValue.trim()) {
@@ -43,7 +43,7 @@ function Search() {
 
     const handleClear = () => {
         setSearchValue('');
-        // setSearchResult([]);
+        setSearchResult([]);
         inputRef.current.focus();
     };
 
@@ -58,18 +58,31 @@ function Search() {
     };
 
     const handleChange = (e) => {
-        const searchValue = e.target.value;
-
-        if (!searchValue.startsWith(' ')) {
-            setSearchValue(searchValue);
+        const value = e.target.value;
+        if (!value.startsWith(' ')) {
+            setSearchValue(value);
         }
-        // return;
+    };
+
+    const handleSearch = () => {
+        if (searchValue.trim()) {
+            navigate(`/search?q=${searchValue}`);
+            setSearchValue('');
+            setShowResult(false);
+            inputRef.current.blur();
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
     };
 
     return (
         <div className={cx('wrapper')}>
             <HeadlessTippy
-                interactive={true}
+                interactive
                 visible={showResult && searchResult.length > 0}
                 render={(attrs) => (
                     <div className={cx('search-result')} tabIndex="-1" {...attrs}>
@@ -80,7 +93,9 @@ function Search() {
                                 </div>
                             ))}
                             {visibleCount > 0 && (
-                                <div className={cx('view-more')}>Xem thêm {visibleCount} sản phẩm</div>
+                                <div className={cx('view-more')} onClick={handleSearch}>
+                                    Xem thêm {visibleCount} sản phẩm
+                                </div>
                             )}
                         </div>
                     </div>
@@ -95,6 +110,7 @@ function Search() {
                         placeholder="Tìm kiếm sản phẩm..."
                         spellCheck={false}
                         onChange={handleChange}
+                        onKeyDown={handleKeyPress}
                         onFocus={() => setShowResult(true)}
                     />
                     {!!searchValue && !loading && (
@@ -102,14 +118,8 @@ function Search() {
                             <FontAwesomeIcon icon={faXmarkCircle} />
                         </button>
                     )}
-                    {!!searchValue && !false && (
-                        <button className={cx('clear')} onClick={handleClear}>
-                            <FontAwesomeIcon icon={faXmarkCircle} />
-                        </button>
-                    )}
-
                     {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}
-                    <button className={cx('search-btn')}>
+                    <button className={cx('search-btn')} onClick={handleSearch}>
                         <FontAwesomeIcon icon={faMagnifyingGlass} />
                     </button>
                 </div>

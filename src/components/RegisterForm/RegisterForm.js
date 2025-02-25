@@ -32,10 +32,11 @@ import * as authService from '~/services/authService';
 const cx = classnames.bind(styles);
 
 function RegisterForm() {
-    // const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+    const isEmail = (email) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     //Inputs
     const [lastName, setLastName] = useState('');
@@ -46,7 +47,7 @@ function RegisterForm() {
     const [passwordInput, setPasswordInput] = useState('');
     const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
     const [isDefaultSet, setIsDefaultSet] = useState(false); // Cờ để kiểm tra nếu giá trị mặc định đã được gán
-    const [isMatchPassword, setIsMatchPassword] = useState(true); // Cờ để kiểm tra nếu giá trị mặc định đã được gán
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleOpen = () => {
         if (!isDefaultSet) {
@@ -65,9 +66,33 @@ function RegisterForm() {
         event.preventDefault();
     };
 
+    // Handles Display and Hide Confirm Password
+    const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+    const handleMouseDownConfirmPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const handleMouseUpConfirmPassword = (event) => {
+        event.preventDefault();
+    };
+
     const handleRegister = async () => {
         // Gọi API để đăng ký
         const formattedDate = dayjs(birthdayInput).format('DD/MM/YYYY');
+
+        if (!isEmail(emailInput)) {
+            setErrorMessage('Email không đúng định dạng');
+            return;
+        } else {
+            setErrorMessage('');
+        }
+
+        if (dayjs(birthdayInput).isAfter(dayjs(), 'day')) {
+            setErrorMessage('Ngày sinh phải trước ngày hiện tại.');
+            return;
+        } else {
+            setErrorMessage('');
+        }
 
         if (passwordInput === confirmPasswordInput) {
             const res = await authService.register(
@@ -83,10 +108,9 @@ function RegisterForm() {
                 console.log('Success');
                 navigate('/login');
             }
-
-            console.log(res);
+            setErrorMessage('');
         } else {
-            setIsMatchPassword(false);
+            setErrorMessage('Mật khẩu không khớp');
         }
     };
 
@@ -385,31 +409,37 @@ function RegisterForm() {
                         <InputLabel htmlFor="outlined-adornment-confirm-password">Nhập lại mật khẩu</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-confirm-password"
-                            type={showPassword ? 'text' : 'password'}
+                            type={showConfirmPassword ? 'text' : 'password'}
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
                                         aria-label={showPassword ? 'hide the password' : 'display the password'}
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                        onMouseUp={handleMouseUpPassword}
+                                        onClick={handleClickShowConfirmPassword}
+                                        onMouseDown={handleMouseDownConfirmPassword}
+                                        onMouseUp={handleMouseUpConfirmPassword}
                                         edge="end"
                                     >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 </InputAdornment>
                             }
-                            label="Nhập lại mật khẩu"
+                            label="Xác nhận mật khẩu"
                             value={confirmPasswordInput}
                             onChange={(event) => {
                                 setConfirmPasswordInput(event.target.value);
                             }}
                         />
                     </FormControl>
-                    {!isMatchPassword && (
+                    {/* {!isMatchPassword && (
                         <div className={cx('error-container')}>
                             <FontAwesomeIcon icon={faTriangleExclamation} />
                             <span className={cx('error-message')}>Mật khẩu không khớp</span>
+                        </div>
+                    )} */}
+                    {errorMessage !== '' && (
+                        <div className={cx('error-container')}>
+                            <FontAwesomeIcon icon={faTriangleExclamation} />
+                            <span className={cx('error-message')}>{errorMessage}</span>
                         </div>
                     )}
                     <div className={cx('action-container')}>

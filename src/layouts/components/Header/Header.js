@@ -4,10 +4,10 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAddressBook, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { MenuItem } from '@mui/material';
-import { faAngleDown, faArrowRightFromBracket, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faArrowRightFromBracket, faMinus, faPlus, faGauge } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Header.module.scss';
-import { AccountIcon, CartIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
+import { AccountIcon, CartIcon, ClipBoardListIcon, ShoppingCartIcon } from '~/components/Icons/Icons';
 import Button from '~/components/Button';
 import Search from '../Search';
 import DropDownMenu from '~/components/DropDownMenu';
@@ -115,7 +115,6 @@ function Header() {
         {
             title: 'Thông tin tài khoản',
             icon: <FontAwesomeIcon icon={faUser} />,
-            to: '/account',
             value: 'view-profile',
             clickAction: () => {
                 navigate('/account');
@@ -130,6 +129,27 @@ function Header() {
             },
         },
         {
+            title: 'Đơn mua',
+            icon: <ClipBoardListIcon />,
+            value: 'purchase',
+            clickAction: () => {
+                navigate('/account/purchase');
+            },
+        },
+        ...(auth?.user?.role === 'admin'
+            ? [
+                  {
+                      title: 'Admin Dashboard',
+                      icon: <FontAwesomeIcon icon={faGauge} />, // Dùng icon phù hợp
+                      to: '/admin',
+                      value: 'admin',
+                      clickAction: () => {
+                          navigate('/admin');
+                      },
+                  },
+              ]
+            : []), // Nếu không phải admin, không thêm mục này
+        {
             title: 'Đăng xuất',
             icon: <FontAwesomeIcon icon={faArrowRightFromBracket} />,
             clickAction: () => {
@@ -140,6 +160,7 @@ function Header() {
                         id: '',
                         email: '',
                         name: '',
+                        role: '',
                     },
                 });
                 setAccountOpen(false);

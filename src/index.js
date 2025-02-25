@@ -7,6 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import GlobalStyles from '~/components/GlobalStyles';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { AddressProvider } from './contexts/AddressContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,7 +15,9 @@ root.render(
         <GlobalStyles>
             <AuthProvider>
                 <CartProvider>
-                    <App />
+                    <AddressProvider>
+                        <App />
+                    </AddressProvider>
                 </CartProvider>
             </AuthProvider>
         </GlobalStyles>
