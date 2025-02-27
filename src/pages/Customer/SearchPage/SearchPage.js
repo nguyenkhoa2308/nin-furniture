@@ -23,6 +23,8 @@ function SearchPage() {
     const debouncedValue = useDebounce(query, 500);
 
     useEffect(() => {
+        if (debouncedValue === null) return;
+
         if (!debouncedValue.trim()) {
             setSearchResult([]);
             return;
@@ -64,6 +66,15 @@ function SearchPage() {
                     </div>
                 ) : (
                     <>
+                        <div className={cx('heading-page')}>
+                            <h1 className={cx('title')}>Tìm kiếm</h1>
+                            <p className={cx('sub-title')}>
+                                Có <strong>{searchResult.length} sản phẩm</strong> cho tìm kiếm
+                            </p>
+                        </div>
+                        <p className={cx('subtext-result')}>
+                            Kết quả tìm kiếm cho <strong>"{query}"</strong>.
+                        </p>
                         <div className={cx('product-wrapper')}>
                             {currentProducts.map((product, index) => {
                                 return <ProductCard product={product} key={index} />;

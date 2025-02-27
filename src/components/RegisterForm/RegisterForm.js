@@ -104,11 +104,13 @@ function RegisterForm() {
                 formattedDate,
             );
 
-            if (res) {
+            if (res.EC === 1) {
+                setErrorMessage(res.EM);
+            } else {
                 console.log('Success');
                 navigate('/login');
+                setErrorMessage('');
             }
-            setErrorMessage('');
         } else {
             setErrorMessage('Mật khẩu không khớp');
         }
@@ -430,12 +432,6 @@ function RegisterForm() {
                             }}
                         />
                     </FormControl>
-                    {/* {!isMatchPassword && (
-                        <div className={cx('error-container')}>
-                            <FontAwesomeIcon icon={faTriangleExclamation} />
-                            <span className={cx('error-message')}>Mật khẩu không khớp</span>
-                        </div>
-                    )} */}
                     {errorMessage !== '' && (
                         <div className={cx('error-container')}>
                             <FontAwesomeIcon icon={faTriangleExclamation} />

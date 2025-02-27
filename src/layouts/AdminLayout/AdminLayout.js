@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import styles from './AdminLayout.module.scss';
 
-import SideBar from '~/layouts/AdminLayout/components/SideBar/SideBar';
+import SideBar from '~/layouts/AdminLayout/components/SideBar';
 
 const cx = classNames.bind(styles);
 

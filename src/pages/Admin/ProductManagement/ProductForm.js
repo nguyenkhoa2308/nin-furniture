@@ -17,6 +17,7 @@ const ProductForm = ({ show, handleClose, handleSave, initialData }) => {
         stock: '',
         rooms: [],
         category: '',
+        sold: 0,
         variant: [],
     };
 
@@ -190,6 +191,18 @@ const ProductForm = ({ show, handleClose, handleSave, initialData }) => {
                             type="number"
                             name="stock"
                             value={product.stock}
+                            onChange={handleChange}
+                            required
+                            className={cx('form-input')}
+                        />
+                    </Form.Group>
+
+                    <Form.Group className={cx('form-group')}>
+                        <Form.Label className={cx('form-label')}>Đã bán</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="sold"
+                            value={product.sold}
                             onChange={handleChange}
                             required
                             className={cx('form-input')}

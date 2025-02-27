@@ -17,6 +17,33 @@
     justify-content: center;
 }
 
+.heading-page {
+    position: relative;
+    text-align: center;
+    margin-bottom: 20px;
+
+    & .title {
+        margin: 25px 0 5px;
+        font-size: 3rem;
+        color: var(--primary);
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    &::after {
+        content: '';
+        background: #252a2b;
+        display: block;
+        width: 60px;
+        height: 4px;
+        margin: 20px auto 30px;
+    }
+}
+
+.subtext-result {
+    padding-left: 7px;
+}
+
 .pagination-shop {
     display: flex;
     justify-content: center;
