@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import Slider from 'react-slick';
 
 // import
-import './slider.scss';
-import styles from './NewProducts.module.scss';
+import '~/components/NewProducts/slider.scss';
+import styles from './BestSellerProducts.module.scss';
 import ProductCard from '../ProductCard';
 
 const cx = classnames.bind(styles);
 
-function NewProducts({ products }) {
-    const [newProducts, setNewProducts] = useState([]);
+function BestSellerProducts({ products }) {
+    const [bestSellingProducts, setBestSellingProducts] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
 
     const handleBeforeChange = () => setIsDragging(true);
@@ -23,14 +23,14 @@ function NewProducts({ products }) {
     };
 
     useEffect(() => {
-        if (!Array.isArray(products) || products.length === 0) return;
+        if (!Array.isArray(products) || products.length === 0) return; // Kiểm tra products trước khi xử lý
 
-        const sortedNewProducts = [...products]
-            .filter((product) => product.createdAt !== undefined) // Đảm bảo có createdAt
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sắp xếp từ mới -> cũ
+        const sortedBestSellingProducts = [...products]
+            .filter((product) => product.sold !== undefined) // Đảm bảo product có thuộc tính sold
+            .sort((a, b) => (b.sold || 0) - (a.sold || 0)) // Sắp xếp theo sold, tránh lỗi undefined
             .slice(0, 10);
 
-        setNewProducts(sortedNewProducts);
+        setBestSellingProducts(sortedBestSellingProducts);
     }, [products]);
 
     const settings = {
@@ -75,7 +75,7 @@ function NewProducts({ products }) {
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
                 <Slider {...settings} className={cx('slider')}>
-                    {newProducts.map((item, index) => {
+                    {bestSellingProducts.map((item, index) => {
                         return <ProductCard product={item} key={index} handleClick={handleClick} />;
                     })}
                 </Slider>
@@ -84,4 +84,4 @@ function NewProducts({ products }) {
     );
 }
 
-export default NewProducts;
+export default BestSellerProducts;

@@ -28,6 +28,8 @@ const ProductManagement = () => {
 
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
+    const [delProductId, setDelProductId] = useState(null);
+
     const [currentProduct, setCurrentProduct] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 12;
@@ -65,9 +67,13 @@ const ProductManagement = () => {
 
     const handleDelete = async (id) => {
         setIsConfirmDialogOpen(true);
-        // setCartItemId(id);
-        await httpRequest.delete(`/products/${id}`);
+        setDelProductId(id);
+        // await httpRequest.delete(`/products/${id}`);
+    };
 
+    const handleConfirm = async () => {
+        await httpRequest.delete(`/products/${delProductId}`);
+        setIsConfirmDialogOpen(false);
         fetchProducts();
     };
 
@@ -75,6 +81,7 @@ const ProductManagement = () => {
         try {
             if (product._id) {
                 await httpRequest.put(`/products/${product._id}`, product);
+                setCurrentProduct(null);
             } else {
                 await httpRequest.post('/products/add', product);
             }
@@ -197,8 +204,7 @@ const ProductManagement = () => {
                 isOpen={isConfirmDialogOpen}
                 onClose={() => setIsConfirmDialogOpen(false)}
                 onConfirm={() => {
-                    // deleteCartItem(cartItemId);
-                    setIsConfirmDialogOpen(false);
+                    handleConfirm();
                 }}
                 title="Bạn chắc chắn muốn xóa sản phẩm này?"
             />

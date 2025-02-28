@@ -17,6 +17,7 @@ const ProductForm = ({ show, handleClose, handleSave, initialData }) => {
         stock: '',
         rooms: [],
         category: '',
+        description: '',
         sold: 0,
         variant: [],
     };
@@ -250,6 +251,18 @@ const ProductForm = ({ show, handleClose, handleSave, initialData }) => {
                                 ),
                             )}
                         </div>
+                    </Form.Group>
+
+                    <Form.Group className={cx('form-group')}>
+                        <Form.Label className={cx('form-label')}>Mô tả</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            name="description"
+                            value={product.description}
+                            onChange={handleChange}
+                            rows={10}
+                            className={cx('form-input')}
+                        />
                     </Form.Group>
 
                     <h5 className={cx('form-label')}>Biến thể</h5>

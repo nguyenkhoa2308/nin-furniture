@@ -139,7 +139,7 @@ function Header() {
         ...(auth?.user?.role === 'admin'
             ? [
                   {
-                      title: 'Admin Dashboard',
+                      title: 'Trang Admin',
                       icon: <FontAwesomeIcon icon={faGauge} />, // Dùng icon phù hợp
                       to: '/admin',
                       value: 'admin',

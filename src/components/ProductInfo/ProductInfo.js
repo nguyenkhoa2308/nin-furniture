@@ -37,11 +37,11 @@ function ProductInfo({ data, onClose = () => {} }) {
     };
 
     const handleInputChange = (e) => {
-        let value = Number(e.target.value); // 🔥 Chuyển chuỗi thành số
+        let value = Number(e.target.value);
         if (isNaN(value) || value < 1) {
-            value = 1; // Không cho phép số âm hoặc giá trị NaN
+            value = 1;
         } else if (value > data?.stock) {
-            value = data?.stock; // Không cho phép nhập quá số lượng có sẵn
+            value = data?.stock;
         }
         setCount(value);
     };
@@ -112,7 +112,7 @@ function ProductInfo({ data, onClose = () => {} }) {
                     {showVariant && (
                         <div className={cx('variants', 'd-flex', 'align-items-center')}>
                             <div className={cx('label')}>
-                                Màu sắc:
+                                Phiên bản:
                                 <strong className={cx('variant-name')}>{data?.variant[variantSelect].name}</strong>
                             </div>
                             <div className={cx('variant-select')}>
@@ -153,22 +153,34 @@ function ProductInfo({ data, onClose = () => {} }) {
                             </div>
                         </div>
                         <div className={cx('add-cart-area')}>
-                            <Button
-                                outline
-                                xLarge
-                                className={cx('add-cart-btn')}
-                                onClick={() => handleAddToCart(data?._id, count, data?.variant[variantSelect]?._id)}
-                            >
-                                Thêm vào giỏ
-                            </Button>
-                            <Button
-                                primary
-                                xLarge
-                                className={cx('buy-btn')}
-                                onClick={() => handleBuyNow(data?._id, count, data?.variant[variantSelect]?._id)}
-                            >
-                                Mua ngay
-                            </Button>
+                            {data.stock === 0 ? (
+                                <Button outline xLarge className={cx('out-of-stock-btn')}>
+                                    Hết hàng
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        outline
+                                        xLarge
+                                        className={cx('add-cart-btn')}
+                                        onClick={() =>
+                                            handleAddToCart(data?._id, count, data?.variant[variantSelect]?._id)
+                                        }
+                                    >
+                                        Thêm vào giỏ
+                                    </Button>
+                                    <Button
+                                        primary
+                                        xLarge
+                                        className={cx('buy-btn')}
+                                        onClick={() =>
+                                            handleBuyNow(data?._id, count, data?.variant[variantSelect]?._id)
+                                        }
+                                    >
+                                        Mua ngay
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

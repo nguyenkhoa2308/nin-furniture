@@ -75,9 +75,13 @@ function SearchPage() {
                         <p className={cx('subtext-result')}>
                             Kết quả tìm kiếm cho <strong>"{query}"</strong>.
                         </p>
-                        <div className={cx('product-wrapper')}>
+                        <div className={cx('product-wrapper', 'row')}>
                             {currentProducts.map((product, index) => {
-                                return <ProductCard product={product} key={index} />;
+                                return (
+                                    <div key={index} className={cx('product-item', 'col-md-2', 'col-6')}>
+                                        <ProductCard product={product} />
+                                    </div>
+                                );
                             })}
                         </div>
                         <CustomPagination currentPage={currentPage} totalPages={totalPages} onPageChange={paginate} />

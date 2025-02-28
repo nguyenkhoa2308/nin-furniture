@@ -5,7 +5,7 @@ import { useContext } from 'react';
 
 import styles from './SideBar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBackward, faBoxOpen, faChartLine, faList, faTruck, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faBoxOpen, faList, faTruck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { AuthContext } from '~/contexts/AuthContext';
 // import { faUser } from '@fortawesome/free-regular-svg-icons';
 
@@ -18,8 +18,8 @@ function SideBar() {
     const location = useLocation();
 
     const menuItems = [
-        { path: '/admin', name: 'Dashboard', icon: <FontAwesomeIcon icon={faChartLine} /> },
-        { path: '/admin/products', name: 'Sản phẩm', icon: <FontAwesomeIcon icon={faBoxOpen} /> },
+        // { path: '/admin', name: 'Dashboard', icon: <FontAwesomeIcon icon={faChartLine} /> },
+        { path: '/admin', name: 'Sản phẩm', icon: <FontAwesomeIcon icon={faBoxOpen} /> },
         { path: '/admin/orders', name: 'Đơn hàng', icon: <FontAwesomeIcon icon={faTruck} /> },
         { path: '/admin/users', name: 'Người dùng', icon: <FontAwesomeIcon icon={faUser} /> },
         { path: '/admin/categories', name: 'Danh mục', icon: <FontAwesomeIcon icon={faList} /> },

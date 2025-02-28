@@ -43,6 +43,14 @@ const SORT_MENU = [
     },
 ];
 
+const ROOM_MAP = {
+    'living-room': 'Phòng khách',
+    bedroom: 'Phòng ngủ',
+    office: 'Nội thất văn phòng',
+    bathroom: 'Phòng tắm',
+    kitchen: 'Phòng bếp',
+};
+
 const priceOptions = [
     { label: 'Dưới 1.000.000₫', value: '<1000000' },
     { label: '1.000.000₫ - 2.000.000₫', value: '1000000-2000000' },
@@ -57,8 +65,16 @@ function CategoryPage() {
     const [brands, setBrands] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedPrices, setSelectedPrices] = useState([]);
-    const [category, setCategory] = useState('');
+    const [pageTitle, setPageTitle] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // Chuyển trang
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+
+        // Cuộn trang về vị trí danh sách sản phẩm (hoặc vị trí mong muốn)
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const slug = useParams();
 
@@ -76,6 +92,7 @@ function CategoryPage() {
         setSelectedBrands((prevSelected) =>
             prevSelected.includes(brand) ? prevSelected.filter((item) => item !== brand) : [...prevSelected, brand],
         );
+        setCurrentPage(1);
     };
 
     // Xử lý khi chọn khoảng giá
@@ -85,20 +102,26 @@ function CategoryPage() {
                 ? prevSelected.filter((item) => item !== priceRange)
                 : [...prevSelected, priceRange],
         );
+        setCurrentPage(1);
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await httpRequest.get(`categories/${slug.slug}`);
-                setCategory(res);
-            } catch (err) {
-                console.log(err);
-            }
-        };
-
-        fetchData();
-        // eslint-disable-next-line
+        setCurrentPage(1);
+        if (ROOM_MAP[slug.slug]) {
+            // Nếu là room, setCategory thành tên tiếng Việt
+            setPageTitle(ROOM_MAP[slug.slug]);
+        } else {
+            // Nếu không, gọi API để lấy category
+            const fetchData = async () => {
+                try {
+                    const res = await httpRequest.get(`categories/${slug.slug}`);
+                    setPageTitle(res.displayName);
+                } catch (err) {
+                    console.log(err);
+                }
+            };
+            fetchData();
+        }
     }, [slug]);
 
     const renderMenu = () => {
@@ -186,7 +209,7 @@ function CategoryPage() {
                     <div className={cx('heading')}>
                         <div className={cx('heading-content')}>
                             <div className={cx('heading-box')}>
-                                <h1 className={cx('heading-title')}>{category.displayName}</h1>
+                                <h1 className={cx('heading-title')}>{pageTitle}</h1>
                                 <div className={cx('filter-box')}>
                                     <span className={cx('title-count')}>
                                         <b>{productCount}</b> sản phẩm
@@ -270,11 +293,12 @@ function CategoryPage() {
                             sortBy={selectedValue}
                             selectedBrands={selectedBrands}
                             selectedPrices={selectedPrices}
+                            currentPage={currentPage}
+                            paginate={paginate}
                         />
                     </div>
                 </div>
             </div>
-
             <ToastContainer />
         </div>
     );

@@ -6,10 +6,19 @@ import styles from './ProductList.module.scss';
 
 import httpRequest from '~/utils/httpRequest';
 import ProductCard from '~/components/ProductCard';
+import CustomPagination from '~/components/CustomPagination';
 
 const cx = classnames.bind(styles);
 
-function ProductList({ onProductCountChange, onBrandChange, sortBy, selectedBrands, selectedPrices }) {
+function ProductList({
+    onProductCountChange,
+    onBrandChange,
+    sortBy,
+    selectedBrands,
+    selectedPrices,
+    currentPage,
+    paginate,
+}) {
     const [products, setProducts] = useState([]);
 
     const [loading, setLoading] = useState(true);
@@ -17,6 +26,9 @@ function ProductList({ onProductCountChange, onBrandChange, sortBy, selectedBran
     const category = useParams();
     const firstLoad = useRef(true);
     const previousCategory = useRef(null);
+
+    // const [currentProduct, setCurrentProduct] = useState(null);
+    const itemsPerPage = 12;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,19 +42,17 @@ function ProductList({ onProductCountChange, onBrandChange, sortBy, selectedBran
 
                 if (sortBy) queryParams.append('sortBy', sortBy);
                 const res = await httpRequest.get(`/products/category/${category.slug}?${queryParams.toString()}`);
-
-                const filteredProducts = res.filter((product) => product.category.slug === category.slug);
-                setProducts(filteredProducts);
+                setProducts(res);
 
                 if (previousCategory.current !== category.slug) {
                     firstLoad.current = true;
                     previousCategory.current = category.slug;
                 }
 
-                onProductCountChange(filteredProducts.length);
+                onProductCountChange(res.length);
 
                 if (firstLoad.current) {
-                    const brands = Array.from(new Set(filteredProducts.map((product) => product.brand))); // Lấy các brand duy nhất
+                    const brands = Array.from(new Set(res.map((product) => product.brand))); // Lấy các brand duy nhất
                     onBrandChange(brands);
                     firstLoad.current = false;
                 }
@@ -65,15 +75,26 @@ function ProductList({ onProductCountChange, onBrandChange, sortBy, selectedBran
         return <div>{error}</div>;
     }
 
+    const indexOfLastProduct = currentPage * itemsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    const totalPages = Math.ceil(products.length / itemsPerPage);
+
     return (
-        <div className={cx('wrapper')}>
-            {products.length === 0 ? (
+        <div className={cx('wrapper', 'row')}>
+            {currentProducts.length === 0 ? (
                 <div>Không tìm thấy kết quả. Vui lòng thử lại!</div>
             ) : (
-                products.map((product, index) => {
-                    return <ProductCard product={product} key={index} />;
+                currentProducts.map((product, index) => {
+                    return (
+                        <div key={index} className={cx('product-item', 'col-md-3', 'col-6')}>
+                            <ProductCard product={product} />
+                        </div>
+                    );
                 })
             )}
+            <CustomPagination currentPage={currentPage} totalPages={totalPages} onPageChange={paginate} />
         </div>
     );
 }

@@ -10,11 +10,15 @@ import { CartContext } from '~/contexts/CartContext';
 
 const cx = classnames.bind(styles);
 
-function ProductCard({ product }) {
+function ProductCard({ product, handleClick }) {
     const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState();
 
     const { addToCart } = useContext(CartContext);
+
+    const handleDragStart = (e) => {
+        e.preventDefault();
+    };
 
     const handleAddToCart = async (product) => {
         // await addToCart(productId, quantity);
@@ -31,12 +35,17 @@ function ProductCard({ product }) {
         <div className={cx('product-container')}>
             <div className={cx('product-card')}>
                 <div className={cx('product-image-container')}>
-                    <Link to={`/products/${product.slug}`}>
+                    <Link to={`/products/${product.slug}`} onClick={handleClick}>
                         <img src={product.image} alt={product.name} className={cx('product-image')} />
                     </Link>
                 </div>
                 <div className={cx('product-detail')}>
-                    <Link to={`/products/${product.slug}`}>
+                    <Link
+                        to={`/products/${product.slug}`}
+                        onClick={handleClick}
+                        className={cx('product-link')}
+                        onDragStart={handleDragStart}
+                    >
                         <h3 className={cx('product-name')}>{product.name}</h3>
                     </Link>
                     <div className={cx('product-price')}>
@@ -58,12 +67,18 @@ function ProductCard({ product }) {
                             <Button
                                 text
                                 small
-                                className={cx('add-to-cart-btn')}
+                                className={cx('add-to-cart-btn', {
+                                    disabled: product.stock === 0,
+                                })}
                                 onClick={() => handleAddToCart(product)}
                                 // rightIcon={<CartIcon width="1.6rem" height="3.1rem" />}
                             >
-                                Thêm vào giỏ
-                                <span className={cx('cart-icon')}>
+                                {product.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ'}
+                                <span
+                                    className={cx('cart-icon', {
+                                        disabled: product.stock === 0,
+                                    })}
+                                >
                                     <CartIcon width="1.6rem" height="3.1rem" />
                                 </span>
                             </Button>
