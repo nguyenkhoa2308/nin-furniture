@@ -7,6 +7,19 @@
 .container {
     display: flex;
     margin-top: 32px;
+    // height: 50vh;
+}
+
+.loading-container {
+    height: 50vh;
+    margin: auto;
+    display: flex;
+}
+
+.loading-spinner {
+    margin: auto;
+    // height: 100%;
+    display: flex;
 }
 
 .filter {

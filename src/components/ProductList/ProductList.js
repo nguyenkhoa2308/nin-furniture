@@ -7,6 +7,7 @@ import styles from './ProductList.module.scss';
 import httpRequest from '~/utils/httpRequest';
 import ProductCard from '~/components/ProductCard';
 import CustomPagination from '~/components/CustomPagination';
+// import { Spinner } from 'react-bootstrap';
 
 const cx = classnames.bind(styles);
 
@@ -31,6 +32,7 @@ function ProductList({
     const itemsPerPage = 12;
 
     useEffect(() => {
+        setLoading(true);
         const fetchData = async () => {
             try {
                 let queryParams = new URLSearchParams();
@@ -59,7 +61,9 @@ function ProductList({
             } catch (err) {
                 setError('Failed to fetch products');
             } finally {
+                // setTimeout(() => {
                 setLoading(false);
+                // }, 200);
             }
         };
 
@@ -68,7 +72,8 @@ function ProductList({
     }, [category, sortBy, selectedBrands, selectedPrices]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <></>;
+        // <Spinner animation="border" className={cx('loading-spinner')} />;
     }
 
     if (error) {

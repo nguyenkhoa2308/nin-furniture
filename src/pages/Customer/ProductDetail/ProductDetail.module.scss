@@ -238,6 +238,10 @@
     padding: 15px;
 }
 
+.description-header {
+    border-bottom: 2px solid #ededed;
+}
+
 .description-title {
     display: inline-block;
     color: var(--primary);
@@ -260,4 +264,19 @@
 
 .description-content {
     padding-top: 20px;
+}
+
+.action-section {
+    display: flex;
+}
+
+.toggle-btn {
+    margin: 16px auto;
+    text-transform: uppercase;
+    font-weight: bold;
+
+    &:hover {
+        background-color: var(--primary);
+        color: var(--white);
+    }
 }

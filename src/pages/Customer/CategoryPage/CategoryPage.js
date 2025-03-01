@@ -9,6 +9,7 @@ import Button from '~/components/Button';
 import ProductList from '~/components/ProductList';
 import httpRequest from '~/utils/httpRequest';
 import { ToastContainer } from 'react-toastify';
+import { Spinner } from 'react-bootstrap';
 
 const cx = classnames.bind(styles);
 
@@ -68,12 +69,19 @@ function CategoryPage() {
     const [pageTitle, setPageTitle] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
+    const [loading, setLoading] = useState(false);
+
     // Chuyển trang
     const paginate = (pageNumber) => {
+        // setLoading(true);
         setCurrentPage(pageNumber);
 
         // Cuộn trang về vị trí danh sách sản phẩm (hoặc vị trí mong muốn)
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // setTimeout(() => {
+        //     setLoading(false);
+        // }, 500);
     };
 
     const slug = useParams();
@@ -107,15 +115,23 @@ function CategoryPage() {
 
     useEffect(() => {
         setCurrentPage(1);
+        // setLoading(true);
+
         if (ROOM_MAP[slug.slug]) {
             // Nếu là room, setCategory thành tên tiếng Việt
             setPageTitle(ROOM_MAP[slug.slug]);
+            // setTimeout(() => {
+            //     setLoading(false);
+            // }, 350);
         } else {
             // Nếu không, gọi API để lấy category
             const fetchData = async () => {
                 try {
                     const res = await httpRequest.get(`categories/${slug.slug}`);
-                    setPageTitle(res.displayName);
+                    // setPageTitle(res.displayName);
+                    // setTimeout(() => {
+                    //     setLoading(false);
+                    // }, 300);
                 } catch (err) {
                     console.log(err);
                 }
@@ -146,158 +162,170 @@ function CategoryPage() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
-                <div className={cx('filter')}>
-                    {/* filter brand */}
-                    <div className={cx('filter-group')}>
-                        <div className={cx('filter-group-block')}>
-                            <div className={cx('filter-group-title')}>
-                                <span className={cx('text')}>Nhà cung cấp</span>
-                            </div>
-                            <div className={cx('filter-group-content')}>
-                                <ul className={cx('checkbox-list')}>
-                                    {brands.map((item, index) => {
-                                        return (
-                                            <li className={cx('checkbox-item')} key={index}>
-                                                <input
-                                                    type="checkbox"
-                                                    id={`data-brand-${index}`}
-                                                    value={item}
-                                                    className={cx('input-field')}
-                                                    checked={selectedBrands.includes(item)}
-                                                    onChange={() => handleBrandSelect(item)}
-                                                />
-                                                <label className={cx('checkbox-label')} htmlFor={`data-brand-${index}`}>
-                                                    {item}
-                                                </label>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        </div>
+                {loading ? (
+                    <div className={cx('loading-container')}>
+                        <Spinner animation="border" className={cx('loading-spinner')} />
                     </div>
-                    {/* filter price */}
-                    <div className={cx('filter-group')}>
-                        <div className={cx('filter-group-block')}>
-                            <div className={cx('filter-group-title')}>
-                                <span className={cx('text')}>Giá</span>
-                            </div>
-                            <div className={cx('filter-group-content')}>
-                                <ul className={cx('checkbox-list')}>
-                                    {priceOptions.map((price, index) => (
-                                        <li className={cx('checkbox-item')} key={index}>
-                                            <input
-                                                type="checkbox"
-                                                id={`price-${index}`}
-                                                className={cx('input-field')}
-                                                checked={selectedPrices.includes(price.value)}
-                                                onChange={() => handlePriceSelect(price.value)}
-                                            />
-                                            <label className={cx('checkbox-label')} htmlFor={`price-${index}`}>
-                                                {price.label}
-                                            </label>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    {/* filter color */}
-                    {/* filter size */}
-                </div>
-                <div className={cx('content')}>
-                    <div className={cx('heading')}>
-                        <div className={cx('heading-content')}>
-                            <div className={cx('heading-box')}>
-                                <h1 className={cx('heading-title')}>{pageTitle}</h1>
-                                <div className={cx('filter-box')}>
-                                    <span className={cx('title-count')}>
-                                        <b>{productCount}</b> sản phẩm
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className={cx('heading-sortby')}>
-                                <div className={cx('sortby-container')}>
-                                    <p className={cx('sortby-title')}>
-                                        <span className={cx('sortby-icon')}>
-                                            <FontAwesomeIcon icon={faFilter} />
-                                        </span>
-                                        Sắp xếp
-                                    </p>
-                                </div>
-                                <div className={cx('dropdown')}>
-                                    <div className={cx('menu-list')}>
-                                        <div className={cx('menu-body')}>{renderMenu()}</div>
+                ) : (
+                    <>
+                        {' '}
+                        <div className={cx('filter')}>
+                            {/* filter brand */}
+                            <div className={cx('filter-group')}>
+                                <div className={cx('filter-group-block')}>
+                                    <div className={cx('filter-group-title')}>
+                                        <span className={cx('text')}>Nhà cung cấp</span>
+                                    </div>
+                                    <div className={cx('filter-group-content')}>
+                                        <ul className={cx('checkbox-list')}>
+                                            {brands.map((item, index) => {
+                                                return (
+                                                    <li className={cx('checkbox-item')} key={index}>
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`data-brand-${index}`}
+                                                            value={item}
+                                                            className={cx('input-field')}
+                                                            checked={selectedBrands.includes(item)}
+                                                            onChange={() => handleBrandSelect(item)}
+                                                        />
+                                                        <label
+                                                            className={cx('checkbox-label')}
+                                                            htmlFor={`data-brand-${index}`}
+                                                        >
+                                                            {item}
+                                                        </label>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
+                            {/* filter price */}
+                            <div className={cx('filter-group')}>
+                                <div className={cx('filter-group-block')}>
+                                    <div className={cx('filter-group-title')}>
+                                        <span className={cx('text')}>Giá</span>
+                                    </div>
+                                    <div className={cx('filter-group-content')}>
+                                        <ul className={cx('checkbox-list')}>
+                                            {priceOptions.map((price, index) => (
+                                                <li className={cx('checkbox-item')} key={index}>
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`price-${index}`}
+                                                        className={cx('input-field')}
+                                                        checked={selectedPrices.includes(price.value)}
+                                                        onChange={() => handlePriceSelect(price.value)}
+                                                    />
+                                                    <label className={cx('checkbox-label')} htmlFor={`price-${index}`}>
+                                                        {price.label}
+                                                    </label>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* filter color */}
+                            {/* filter size */}
                         </div>
-                        <div className={cx('filter-tags')}>
-                            <div
-                                className={cx('brand-tags', {
-                                    opened: selectedBrands.length > 0,
-                                })}
-                            >
-                                Nhà cung cấp:{' '}
-                                <b>
-                                    {selectedBrands.map((value, index) => {
-                                        return (
-                                            <span key={index}>
-                                                {index >= 1 ? ', ' : ''} {value}
+                        <div className={cx('content')}>
+                            <div className={cx('heading')}>
+                                <div className={cx('heading-content')}>
+                                    <div className={cx('heading-box')}>
+                                        <h1 className={cx('heading-title')}>{pageTitle}</h1>
+                                        <div className={cx('filter-box')}>
+                                            <span className={cx('title-count')}>
+                                                <b>{productCount}</b> sản phẩm
                                             </span>
-                                        );
-                                    })}
-                                </b>
-                                <span className={cx('remove-tag')} onClick={() => setSelectedBrands([])}>
-                                    <FontAwesomeIcon icon={faX} />
-                                </span>
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('heading-sortby')}>
+                                        <div className={cx('sortby-container')}>
+                                            <p className={cx('sortby-title')}>
+                                                <span className={cx('sortby-icon')}>
+                                                    <FontAwesomeIcon icon={faFilter} />
+                                                </span>
+                                                Sắp xếp
+                                            </p>
+                                        </div>
+                                        <div className={cx('dropdown')}>
+                                            <div className={cx('menu-list')}>
+                                                <div className={cx('menu-body')}>{renderMenu()}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={cx('filter-tags')}>
+                                    <div
+                                        className={cx('brand-tags', {
+                                            opened: selectedBrands.length > 0,
+                                        })}
+                                    >
+                                        Nhà cung cấp:{' '}
+                                        <b>
+                                            {selectedBrands.map((value, index) => {
+                                                return (
+                                                    <span key={index}>
+                                                        {index >= 1 ? ', ' : ''} {value}
+                                                    </span>
+                                                );
+                                            })}
+                                        </b>
+                                        <span className={cx('remove-tag')} onClick={() => setSelectedBrands([])}>
+                                            <FontAwesomeIcon icon={faX} />
+                                        </span>
+                                    </div>
+                                    <div
+                                        className={cx('price-tags', {
+                                            opened: selectedPrices.length > 0,
+                                        })}
+                                    >
+                                        Giá:{' '}
+                                        <b>
+                                            {selectedPrices.map((value, index) => {
+                                                const label = priceOptions.find((p) => p.value === value)?.label;
+                                                return (
+                                                    <span key={index}>
+                                                        {index >= 1 ? ', ' : ''} {label}
+                                                    </span>
+                                                );
+                                            })}
+                                        </b>
+                                        <span className={cx('remove-tag')} onClick={() => setSelectedPrices([])}>
+                                            <FontAwesomeIcon icon={faX} />
+                                        </span>
+                                    </div>
+                                    <div
+                                        className={cx('remove-all-tags', {
+                                            opened: selectedBrands.length > 0 && selectedPrices.length > 0,
+                                        })}
+                                        onClick={() => {
+                                            setSelectedPrices([]);
+                                            setSelectedBrands([]);
+                                        }}
+                                    >
+                                        <span>Xóa hết</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div
-                                className={cx('price-tags', {
-                                    opened: selectedPrices.length > 0,
-                                })}
-                            >
-                                Giá:{' '}
-                                <b>
-                                    {selectedPrices.map((value, index) => {
-                                        const label = priceOptions.find((p) => p.value === value)?.label;
-                                        return (
-                                            <span key={index}>
-                                                {index >= 1 ? ', ' : ''} {label}
-                                            </span>
-                                        );
-                                    })}
-                                </b>
-                                <span className={cx('remove-tag')} onClick={() => setSelectedPrices([])}>
-                                    <FontAwesomeIcon icon={faX} />
-                                </span>
-                            </div>
-                            <div
-                                className={cx('remove-all-tags', {
-                                    opened: selectedBrands.length > 0 && selectedPrices.length > 0,
-                                })}
-                                onClick={() => {
-                                    setSelectedPrices([]);
-                                    setSelectedBrands([]);
-                                }}
-                            >
-                                <span>Xóa hết</span>
+                            <div className={cx('list-product')}>
+                                <ProductList
+                                    onProductCountChange={handleProductCount}
+                                    onBrandChange={handleBrandChange}
+                                    sortBy={selectedValue}
+                                    selectedBrands={selectedBrands}
+                                    selectedPrices={selectedPrices}
+                                    currentPage={currentPage}
+                                    paginate={paginate}
+                                />
                             </div>
                         </div>
-                    </div>
-                    <div className={cx('list-product')}>
-                        <ProductList
-                            onProductCountChange={handleProductCount}
-                            onBrandChange={handleBrandChange}
-                            sortBy={selectedValue}
-                            selectedBrands={selectedBrands}
-                            selectedPrices={selectedPrices}
-                            currentPage={currentPage}
-                            paginate={paginate}
-                        />
-                    </div>
-                </div>
+                    </>
+                )}
             </div>
             <ToastContainer />
         </div>
