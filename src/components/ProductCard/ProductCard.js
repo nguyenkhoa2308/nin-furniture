@@ -7,10 +7,11 @@ import { CartIcon } from '~/components/Icons';
 import Button from '~/components/Button';
 import ProductDialog from '~/components/Dialog/ProductDialog';
 import { CartContext } from '~/contexts/CartContext';
+// import { ToastContainer } from 'react-toastify';
 
 const cx = classnames.bind(styles);
 
-function ProductCard({ product, handleClick }) {
+function ProductCard({ product, handleClick, isHome = false, openDialog }) {
     const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState();
 
@@ -21,13 +22,16 @@ function ProductCard({ product, handleClick }) {
     };
 
     const handleAddToCart = async (product) => {
-        // await addToCart(productId, quantity);
-        setIsProductDialogOpen(true);
-        setCurrentProduct(product);
+        if (isHome) {
+            openDialog(product);
+        } else {
+            setIsProductDialogOpen(true);
+            setCurrentProduct(product);
 
-        if (product.variant.length <= 1) {
-            setIsProductDialogOpen(false);
-            await addToCart(product._id, 1, product.variant[0]?._id);
+            if (product.variant.length <= 1) {
+                setIsProductDialogOpen(false);
+                await addToCart(product._id, 1, product.variant[0]?._id);
+            }
         }
     };
 
@@ -86,14 +90,17 @@ function ProductCard({ product, handleClick }) {
                     </div>
                 </div>
             </div>
-            <ProductDialog
-                data={currentProduct}
-                isOpen={isProductDialogOpen}
-                onClose={() => setIsProductDialogOpen(false)}
-                onConfirm={() => {
-                    setIsProductDialogOpen(false);
-                }}
-            />
+            {!isHome && (
+                <ProductDialog
+                    data={currentProduct}
+                    isOpen={isProductDialogOpen}
+                    onClose={() => setIsProductDialogOpen(false)}
+                    onConfirm={() => {
+                        setIsProductDialogOpen(false);
+                    }}
+                />
+            )}
+            {/* <ToastContainer /> */}
         </div>
     );
 }

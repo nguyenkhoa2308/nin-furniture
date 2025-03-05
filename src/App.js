@@ -21,7 +21,7 @@ import SearchPage from '~/pages/Customer/SearchPage/SearchPage';
 
 //Admin
 import ProtectedRoute from '~/routes/ProtectedRoute';
-// import AdminDashboard from '~/pages/Admin/AdminDashboard';
+import AdminDashboard from '~/pages/Admin/AdminDashboard';
 import AdminLayout from '~/layouts/AdminLayout';
 import UserManagement from '~/pages/Admin/UserManagement';
 import ProductManagement from '~/pages/Admin/ProductManagement';
@@ -58,9 +58,9 @@ function App() {
                         </ProtectedRoute>
                     }
                 >
-                    {/* <Route index element={<AdminDashboard />} /> */}
-                    <Route index element={<ProductManagement />} />
-                    {/* <Route path="products" element={<ProductManagement />} /> */}
+                    <Route index element={<AdminDashboard />} />
+                    {/* <Route index element={<ProductManagement />} /> */}
+                    <Route path="products" element={<ProductManagement />} />
                     <Route path="users" element={<UserManagement />}>
                         <Route path=":id" element={<UserManagement />} />
                     </Route>

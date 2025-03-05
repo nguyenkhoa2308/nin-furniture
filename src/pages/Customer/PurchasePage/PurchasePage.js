@@ -142,6 +142,15 @@ function PurchasePage() {
                                         Hủy đơn hàng
                                     </Button>
                                 )}
+                                {order.status === 'Delivered' && (
+                                    <Button
+                                        primary
+                                        className={cx('confirm-btn')}
+                                        onClick={() => handleCancelOrder(order._id, 'Received')}
+                                    >
+                                        Đã nhận hàng
+                                    </Button>
+                                )}
                                 <Button outline className={cx('view-btn')} onClick={() => handleViewDetail(order)}>
                                     Xem chi tiết
                                 </Button>

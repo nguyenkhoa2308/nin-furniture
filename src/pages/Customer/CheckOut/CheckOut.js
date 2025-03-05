@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faLocationDot, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 // eslint-disable-next-line
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast, Zoom } from 'react-toastify';
 
 import styles from './CheckOut.module.scss';
 import { CartContext } from '~/contexts/CartContext';
@@ -13,14 +13,18 @@ import httpRequest from '~/utils/httpRequest';
 import { useAddress } from '~/contexts/AddressContext';
 import ListAddressesDialog from '~/components/Dialog/ListAddressesDialog';
 import AddressDialog from '~/components/Dialog/AddressDialog';
+import { useNavigate } from 'react-router-dom';
 
 // import AddressDialog from '~/components/Dialog/AddressDialog';
 
 const cx = classNames.bind(styles);
 
 export default function CheckOut() {
-    const { cartItems } = useContext(CartContext);
+    const { cartItems, getCart } = useContext(CartContext);
     const { addresses, getAddresses } = useAddress();
+
+    const navigate = useNavigate();
+
     const [updateAddress, setUpdateAddress] = useState({});
     const [currentAddress, setCurrentAddress] = useState({});
     const [updated, setUpdated] = useState(false);
@@ -98,7 +102,29 @@ export default function CheckOut() {
                     note: note,
                     banking: isBanking,
                 });
-                console.log(response);
+                if (response.status === 200) {
+                    toast.success(
+                        <div>
+                            Đặt hàng thành công! <br /> Quay về trang chủ sau 2s
+                        </div>,
+                        {
+                            position: 'top-right',
+                            autoClose: 1500,
+                            hideProgressBar: false,
+                            closeOnClick: false,
+                            pauseOnHover: false,
+                            draggable: true,
+                            progress: undefined,
+                            theme: 'light',
+                            transition: Zoom,
+                        },
+                    );
+
+                    setTimeout(() => {
+                        navigate('/');
+                        getCart();
+                    }, 2500);
+                }
             } catch (error) {
                 console.error('Error add to order', error);
             }
@@ -107,18 +133,7 @@ export default function CheckOut() {
 
     return (
         <div className={cx('main-content', 'container')}>
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss={false}
-                draggable={false}
-                pauseOnHover={false}
-                theme="light"
-            />
+            <ToastContainer />
             <div className={cx('main')}>
                 <div className={cx('header')}>
                     <p className={cx('header-title')}>Thông tin giao hàng</p>

@@ -129,7 +129,6 @@ function Home() {
                             <div className={cx('banner-hover-effect')} aria-label="Nến thơm">
                                 <img
                                     className={cx('image')}
-                                    data-src="//theme.hstatic.net/200000796751/1001266995/14/homebanner_2_img.jpg?v=83"
                                     src="//theme.hstatic.net/200000796751/1001266995/14/homebanner_2_img.jpg?v=83"
                                     alt="Nến thơm"
                                 />
@@ -141,7 +140,6 @@ function Home() {
                             <div className={cx('banner-hover-effect')} aria-label="Nến thơm">
                                 <img
                                     className={cx('image')}
-                                    data-src="//theme.hstatic.net/200000796751/1001266995/14/homebanner_2_img.jpg?v=83"
                                     src="//theme.hstatic.net/200000796751/1001266995/14/homebanner_2_img.jpg?v=83"
                                     alt="Nến thơm"
                                 />

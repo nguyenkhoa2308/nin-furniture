@@ -1,17 +1,24 @@
 import classnames from 'classnames/bind';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Slider from 'react-slick';
 
 // import
 import '~/components/NewProducts/slider.scss';
 import styles from './BestSellerProducts.module.scss';
 import ProductCard from '../ProductCard';
+import { CartContext } from '~/contexts/CartContext';
+import { ToastContainer } from 'react-toastify';
+import ProductDialog from '../Dialog/ProductDialog';
 
 const cx = classnames.bind(styles);
 
 function BestSellerProducts({ products }) {
+    const { addToCart } = useContext(CartContext);
+
     const [bestSellingProducts, setBestSellingProducts] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [showProductDialogOpen, setShowProductDialogOpen] = useState(false);
+    const [currentProduct, setCurrentProduct] = useState(null);
 
     const handleBeforeChange = () => setIsDragging(true);
     const handleAfterChange = () => setIsDragging(false);
@@ -19,6 +26,16 @@ function BestSellerProducts({ products }) {
     const handleClick = (e) => {
         if (isDragging) {
             e.preventDefault(); // Chặn click nếu vừa kéo
+        }
+    };
+
+    const handleOpenDialog = async (product) => {
+        setCurrentProduct(product);
+        setShowProductDialogOpen(true);
+
+        if (product.variant.length <= 1) {
+            setShowProductDialogOpen(false);
+            await addToCart(product._id, 1, product.variant[0]?._id);
         }
     };
 
@@ -76,9 +93,26 @@ function BestSellerProducts({ products }) {
             <div className={cx('container')}>
                 <Slider {...settings} className={cx('slider')}>
                     {bestSellingProducts.map((item, index) => {
-                        return <ProductCard product={item} key={index} handleClick={handleClick} />;
+                        return (
+                            <ProductCard
+                                product={item}
+                                key={index}
+                                handleClick={handleClick}
+                                openDialog={handleOpenDialog}
+                                isHome={true}
+                            />
+                        );
                     })}
                 </Slider>
+                <ProductDialog
+                    data={currentProduct}
+                    isOpen={showProductDialogOpen}
+                    onClose={() => setShowProductDialogOpen(false)}
+                    onConfirm={() => {
+                        setShowProductDialogOpen(false);
+                    }}
+                />
+                <ToastContainer />
             </div>
         </div>
     );

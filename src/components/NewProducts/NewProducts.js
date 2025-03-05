@@ -1,24 +1,41 @@
 import classnames from 'classnames/bind';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Slider from 'react-slick';
 
 // import
 import './slider.scss';
 import styles from './NewProducts.module.scss';
 import ProductCard from '../ProductCard';
+import ProductDialog from '../Dialog/ProductDialog';
+import { CartContext } from '~/contexts/CartContext';
+import { ToastContainer } from 'react-toastify';
 
 const cx = classnames.bind(styles);
 
 function NewProducts({ products }) {
+    const { addToCart } = useContext(CartContext);
+
     const [newProducts, setNewProducts] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [showProductDialogOpen, setShowProductDialogOpen] = useState(false);
+    const [currentProduct, setCurrentProduct] = useState(null);
 
     const handleBeforeChange = () => setIsDragging(true);
     const handleAfterChange = () => setIsDragging(false);
 
     const handleClick = (e) => {
         if (isDragging) {
-            e.preventDefault(); // Chặn click nếu vừa kéo
+            e.preventDefault();
+        }
+    };
+
+    const handleOpenDialog = async (product) => {
+        setCurrentProduct(product);
+        setShowProductDialogOpen(true);
+
+        if (product.variant.length <= 1) {
+            setShowProductDialogOpen(false);
+            await addToCart(product._id, 1, product.variant[0]?._id);
         }
     };
 
@@ -76,9 +93,26 @@ function NewProducts({ products }) {
             <div className={cx('container')}>
                 <Slider {...settings} className={cx('slider')}>
                     {newProducts.map((item, index) => {
-                        return <ProductCard product={item} key={index} handleClick={handleClick} />;
+                        return (
+                            <ProductCard
+                                product={item}
+                                key={index}
+                                handleClick={handleClick}
+                                isHome={true}
+                                openDialog={handleOpenDialog}
+                            />
+                        );
                     })}
                 </Slider>
+                <ProductDialog
+                    data={currentProduct}
+                    isOpen={showProductDialogOpen}
+                    onClose={() => setShowProductDialogOpen(false)}
+                    onConfirm={() => {
+                        setShowProductDialogOpen(false);
+                    }}
+                />
+                {/* <ToastContainer /> */}
             </div>
         </div>
     );

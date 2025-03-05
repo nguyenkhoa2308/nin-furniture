@@ -128,7 +128,7 @@ function CategoryPage() {
             const fetchData = async () => {
                 try {
                     const res = await httpRequest.get(`categories/${slug.slug}`);
-                    // setPageTitle(res.displayName);
+                    setPageTitle(res.displayName);
                     // setTimeout(() => {
                     //     setLoading(false);
                     // }, 300);
@@ -168,7 +168,6 @@ function CategoryPage() {
                     </div>
                 ) : (
                     <>
-                        {' '}
                         <div className={cx('filter')}>
                             {/* filter brand */}
                             <div className={cx('filter-group')}>

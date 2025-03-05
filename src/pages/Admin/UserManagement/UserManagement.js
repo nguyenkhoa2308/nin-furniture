@@ -121,6 +121,8 @@ function UserManagement() {
                         <th>ID</th>
                         <th>Tên</th>
                         <th>Email</th>
+                        <th>Ngày sinh</th>
+                        <th>Giới tính</th>
                         <th>Vai trò</th>
                         <th>Hành động</th>
                     </tr>
@@ -132,6 +134,8 @@ function UserManagement() {
                                 <td>{user._id}</td>
                                 <td>{user.displayName}</td>
                                 <td>{user.email}</td>
+                                <td>{user.birthDate}</td>
+                                <td>{user.gender ? 'Nam' : 'Nữ'}</td>
                                 <td>{user.role === 'admin' ? 'Admin' : 'Khách hàng'}</td>
 
                                 <td>

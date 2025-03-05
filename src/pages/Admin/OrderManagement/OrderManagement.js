@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Form, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-regular-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Zoom, toast, ToastContainer } from 'react-toastify';
 
-// import axios from 'axios';
-// import moment from 'moment';
-
+import { useDebounce } from '~/hooks';
 import styles from './OrderManagement.module.scss';
 import httpRequest from '~/utils/httpRequest';
-import { useDebounce } from '~/hooks';
 import OrderDetailDialog from '~/components/Dialog/OrderDetailDialog';
 import CustomPagination from '~/components/CustomPagination';
+import ConfirmDialog from '~/components/Dialog/ConfirmDialog';
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +21,7 @@ const OrderManagement = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     // const [updated, setUpdated] = useState(true);
     const [showDialog, setShowDialog] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
     const [statusFilter, setStatusFilter] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -80,10 +81,32 @@ const OrderManagement = () => {
     };
 
     const handleViewDetail = (order) => {
-        console.log(order);
-
         setShowDialog(true);
         setSelectedOrder(order);
+    };
+
+    const handleDelete = async () => {
+        setShowConfirmDialog(false);
+
+        try {
+            const res = await httpRequest.delete(`/order/delete/${selectedOrder._id}`);
+            if (res.status === 200) {
+                toast.success('Xóa đơn hàng thành công!', {
+                    position: 'top-right',
+                    autoClose: 1500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'light',
+                    transition: Zoom,
+                });
+                fetchOrders();
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     // Chuyển trang
@@ -133,30 +156,32 @@ const OrderManagement = () => {
                 <Table striped bordered hover>
                     <thead>
                         <tr>
-                            <th className="text-center">#</th>
+                            {/* <th className="text-center">#</th> */}
                             <th className="text-center">Mã đơn</th>
                             <th className="text-center">Tên Khách hàng</th>
                             <th className="text-center">Tên người nhận</th>
                             <th className="text-center">SĐT</th>
+                            <th className="text-center">Ngày mua</th>
                             <th className="text-center">Tổng tiền</th>
                             <th className="text-center">Trạng thái</th>
                             <th className="text-center">Thay đổi trạng thái</th>
+                            <th className="text-center">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {orders.map((order) => (
                             <tr key={order._id}>
-                                <td className={cx('view-detail-container')}>
-                                    <Button className={cx('view-detail')} onClick={() => handleViewDetail(order)}>
-                                        <FontAwesomeIcon icon={faEye} />
-                                    </Button>
-                                </td>
                                 <td>{order.orderCode}</td>
                                 <td>
                                     {order.user?.lastName} {order.user?.firstName}
                                 </td>
                                 <td>{order.shippingAddress?.fullName}</td>
                                 <td>{order.shippingAddress?.phone}</td>
+                                <td>
+                                    {new Date(order.createdAt).toLocaleString('vi-VN', {
+                                        timeZone: 'Asia/Ho_Chi_Minh',
+                                    })}
+                                </td>
                                 <td>{new Intl.NumberFormat('en-US').format(order.totalPrice * 1000)}</td>
                                 <td className={cx('status-container')}>
                                     <div className={cx('order-status', statusMapping[order.status]?.className)}>
@@ -187,6 +212,22 @@ const OrderManagement = () => {
                                         </>
                                     )}
                                 </td>
+                                <td className={cx('view-detail-container')}>
+                                    <Button className={cx('view-detail')} onClick={() => handleViewDetail(order)}>
+                                        <FontAwesomeIcon icon={faEye} />
+                                    </Button>
+
+                                    <Button
+                                        className={cx('view-detail')}
+                                        onClick={() => {
+                                            setShowConfirmDialog(true);
+                                            setSelectedOrder(order);
+                                        }}
+                                        variant="danger"
+                                    >
+                                        <FontAwesomeIcon icon={faTrash} />
+                                    </Button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -194,6 +235,13 @@ const OrderManagement = () => {
             )}
             <OrderDetailDialog show={showDialog} handleClose={() => setShowDialog(false)} order={selectedOrder} />
             <CustomPagination currentPage={currentPage} totalPages={totalPages} onPageChange={paginate} />
+            <ConfirmDialog
+                isOpen={showConfirmDialog}
+                onConfirm={handleDelete}
+                onClose={() => setShowConfirmDialog(false)}
+                title="Bạn có chắc chắn xóa đơn hàng này không?"
+            />
+            <ToastContainer />
         </div>
     );
 };
