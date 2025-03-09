@@ -1,38 +1,34 @@
-// import classnames from 'classnames/bind';
-import { useEffect, useState } from 'react';
-
+import { useEffect, useState, useCallback } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Navigation, Thumbs, Autoplay } from 'swiper/modules';
-
 import 'swiper/scss';
 import 'swiper/scss/navigation';
 import 'swiper/scss/thumbs';
-
 import './style.scss';
-
-// import styles from './ProductImagesSlider.module.scss';
-
-// const cx = classnames.bind(styles);
 
 function ProductImagesSlider({ images, variantIndex }) {
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
     const [mainSwiper, setMainSwiper] = useState(null);
     const [activeIndex, setActiveIndex] = useState(variantIndex || 0);
 
-    // Khi variantIndex thay đổi, chuyển cả thumb gallery và ảnh lớn
+    // Đợi thumbsSwiper sẵn sàng trước khi gọi slideTo
     useEffect(() => {
-        if (thumbsSwiper && variantIndex !== null) {
-            thumbsSwiper.slideTo(variantIndex);
-        }
-        if (mainSwiper && variantIndex !== null) {
-            mainSwiper.slideTo(variantIndex);
+        if (thumbsSwiper && mainSwiper && variantIndex !== null) {
+            setTimeout(() => {
+                thumbsSwiper.slideTo(variantIndex);
+                mainSwiper.slideTo(variantIndex);
+            }, 100); // Tránh lỗi chưa có slide
         }
     }, [variantIndex, thumbsSwiper, mainSwiper]);
+
+    // Callback để lưu Swiper instance
+    const handleMainSwiper = useCallback((swiper) => setMainSwiper(swiper), []);
+    const handleThumbsSwiper = useCallback((swiper) => setThumbsSwiper(swiper), []);
 
     return (
         <div className="wrapper-swiper">
             <Swiper
-                onSwiper={setMainSwiper}
+                onSwiper={handleMainSwiper}
                 loop={false}
                 spaceBetween={10}
                 navigation={true}
@@ -45,16 +41,15 @@ function ProductImagesSlider({ images, variantIndex }) {
                 onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
                 className="gallery-slider"
             >
-                {images.map((item, index) => {
-                    return (
-                        <SwiperSlide key={index}>
-                            <img src={item} alt={`thumb ${index}`} />
-                        </SwiperSlide>
-                    );
-                })}
+                {images.map((item, index) => (
+                    <SwiperSlide key={index}>
+                        <img src={item} alt={`thumb ${index}`} loading="lazy" />
+                    </SwiperSlide>
+                ))}
             </Swiper>
+
             <Swiper
-                onSwiper={setThumbsSwiper}
+                onSwiper={handleThumbsSwiper}
                 loop={false}
                 spaceBetween={10}
                 slidesPerView={4}
@@ -63,13 +58,11 @@ function ProductImagesSlider({ images, variantIndex }) {
                 modules={[FreeMode, Navigation, Thumbs]}
                 className="gallery-thumb"
             >
-                {images.map((item, index) => {
-                    return (
-                        <SwiperSlide key={index} className={index === activeIndex ? 'active-thumb' : ''}>
-                            <img src={item} alt={`thumb ${index}`} />
-                        </SwiperSlide>
-                    );
-                })}
+                {images.map((item, index) => (
+                    <SwiperSlide key={index} className={index === activeIndex ? 'active-thumb' : ''}>
+                        <img src={item} alt={`thumb ${index}`} loading="lazy" />
+                    </SwiperSlide>
+                ))}
             </Swiper>
         </div>
     );

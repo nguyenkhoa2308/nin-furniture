@@ -80,7 +80,10 @@ const ProductManagement = () => {
     const handleSave = async (product) => {
         try {
             if (product._id) {
-                await httpRequest.put(`/products/${product._id}`, product);
+                // Xóa slug trước khi gửi request để Mongoose cập nhật lại dựa trên name
+                const { slug, ...updatedProduct } = product;
+    
+                await httpRequest.put(`/products/${product._id}`, updatedProduct);
                 setCurrentProduct(null);
             } else {
                 await httpRequest.post('/products/add', product);
@@ -91,6 +94,7 @@ const ProductManagement = () => {
             console.error('Error saving product:', error);
         }
     };
+    
 
     // Tính toán dữ liệu hiển thị theo trang
     const indexOfLastProduct = currentPage * itemsPerPage;

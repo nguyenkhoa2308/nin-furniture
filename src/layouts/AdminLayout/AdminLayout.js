@@ -11,7 +11,7 @@ function AdminLayout() {
     return (
         <div className={cx('wrapper')}>
             <SideBar className="fixed h-full w-64" />
-            <div className={cx('container', 'flex-1', 'p-4', 'ml-64')}>
+            <div className={cx('container', 'flex-1', 'p-4', 'admin-content')}>
                 {/* <div className={cx('content')}>{children}</div> */}
                 <Outlet />
             </div>
